@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import br.com.trier.springvespertino.models.Country;
 import br.com.trier.springvespertino.services.CountryService;
 
@@ -41,6 +40,18 @@ public class CountryResource {
 		return newCountry.size() > 0 ?  ResponseEntity.ok(newCountry) : ResponseEntity.noContent().build();
 	}
 	
+	@GetMapping("/name")
+	public ResponseEntity<List<Country>> findAllCountriesOrderedByName() {
+		List<Country> lista = service.findAllCountriesOrderedByName();
+		return lista.size() > 0 ?  ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
+	}
+	
+	@GetMapping("/name/{name}")
+	public ResponseEntity<List<Country>> findByNameStartsWithIgnoreCase(@PathVariable String name) {
+		List<Country> lista = service.findByNameStartsWithIgnoreCase(name);
+		return lista.size() > 0 ?  ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
+	}
+	
 	@PutMapping("/{id}")
 	public ResponseEntity<Country> update(@PathVariable Integer id, @RequestBody Country country) {
 		country.setId(id);
@@ -53,4 +64,5 @@ public class CountryResource {
 		service.delete(id);
 		return ResponseEntity.ok().build();
 	}
+	
 }

@@ -17,4 +17,8 @@ public interface CountryService {
 	
 	void delete(Integer id);
 	
+	List<Country> findAllCountriesOrderedByName();
+	
+	List<Country> findByNameStartsWithIgnoreCase(String name);
+	
 }

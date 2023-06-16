@@ -44,4 +44,14 @@ public class CountryServiceImpl implements CountryService {
 			repository.delete(country);
 		}
 	}
+
+	@Override
+	public List<Country> findAllCountriesOrderedByName() {
+		return repository.findAllCountriesOrderedByName();
+	}
+
+	@Override
+	public List<Country> findByNameStartsWithIgnoreCase(String name) {
+		return findByNameStartsWithIgnoreCase(name);
+	}
 }

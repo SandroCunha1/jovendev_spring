@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
 import br.com.trier.springvespertino.models.Team;
 import br.com.trier.springvespertino.services.TeamService;
 
@@ -39,6 +38,18 @@ public class TeamResource {
 	public ResponseEntity<List<Team>> listAll() {
 		List<Team> newTeam = service.listAll();
 		return newTeam.size() > 0 ?  ResponseEntity.ok(newTeam) : ResponseEntity.noContent().build();
+	}
+	
+	@GetMapping("/name/{name}")
+	public ResponseEntity<List<Team>> findByNameStartsWithIgnoreCase(@PathVariable String name) {
+		List<Team> lista = service.findByNameStartsWithIgnoreCase(name);
+		return lista.size() > 0 ?  ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
+	}
+	
+	@GetMapping("/name")
+	public ResponseEntity<List<Team>> findAllByOrderByName(@PathVariable Integer id) {
+		List<Team> lista = service.findAllByOrderByName();
+		return lista.size() > 0 ?  ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
 	}
 	
 	@PutMapping("/{id}")

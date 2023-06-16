@@ -16,4 +16,8 @@ public interface ChampionshipService {
 	Championship update (Championship championship);
 	
 	void delete(Integer id);
+	
+	List<Championship> findByYear(Integer year);
+	
+    List<Championship> findByDescriptionContaining(String description);
 }

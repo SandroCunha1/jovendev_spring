@@ -40,6 +40,18 @@ public class ChampionshipResource {
 		return newChampionship.size() > 0 ?  ResponseEntity.ok(newChampionship) : ResponseEntity.noContent().build();
 	}
 	
+	@GetMapping("/year/{year}")
+	public ResponseEntity<List<Championship>> findByYear(Integer year) {
+		List<Championship> newChampionship = service.findByYear(year);
+		return newChampionship.size() > 0 ?  ResponseEntity.ok(newChampionship) : ResponseEntity.noContent().build();
+	}
+
+	@GetMapping("/description/{description}")
+	public ResponseEntity<List<Championship>> findByDescriptionContaining(String description) {
+		List<Championship> newChampionship = service.findByDescriptionContaining(description);
+		return newChampionship.size() > 0 ?  ResponseEntity.ok(newChampionship) : ResponseEntity.noContent().build();
+	}
+	
 	@PutMapping("/{id}")
 	public ResponseEntity<Championship> update(@PathVariable Integer id, @RequestBody Championship championship) {
 		championship.setId(id);

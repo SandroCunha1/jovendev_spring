@@ -40,6 +40,12 @@ public class UserResource {
 		return newUser.size() > 0 ?  ResponseEntity.ok(newUser) : ResponseEntity.noContent().build();
 	}
 	
+	@GetMapping("/name/{name}")
+	public ResponseEntity<List<User>> findByNameStartsWithIgnoreCase(@PathVariable String name) {
+		List<User> lista = service.findByNameStartsWithIgnoreCase(name);
+		return lista.size() > 0 ?  ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
+	}
+	
 	@PutMapping("/{id}")
 	public ResponseEntity<User> update(@PathVariable Integer id, @RequestBody User user) {
 		user.setId(id);

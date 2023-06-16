@@ -14,4 +14,8 @@ public interface TeamService {
 	Team update (Team team);
 	
 	void delete(Integer id);
+	
+	List<Team> findByNameStartsWithIgnoreCase(String name);
+	
+	List<Team> findAllByOrderByName();
 }

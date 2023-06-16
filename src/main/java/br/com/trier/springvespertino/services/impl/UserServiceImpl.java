@@ -45,4 +45,9 @@ public class UserServiceImpl implements UserService {
 		}
 	}
 
+	@Override
+	public List<User> findByNameStartsWithIgnoreCase(String name) {
+		return repository.findByNameStartsWithIgnoreCase(name);
+	}
+
 }

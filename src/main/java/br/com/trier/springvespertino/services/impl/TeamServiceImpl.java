@@ -5,7 +5,6 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
 import br.com.trier.springvespertino.models.Team;
 import br.com.trier.springvespertino.repositories.TeamRepository;
 import br.com.trier.springvespertino.services.TeamService;
@@ -43,5 +42,15 @@ public class TeamServiceImpl implements TeamService {
 		if(team != null) {
 			repository.delete(team);
 		}
+	}
+
+	@Override
+	public List<Team> findByNameStartsWithIgnoreCase(String name) {
+		return repository.findByNameStartsWithIgnoreCase(name);
+	}
+
+	@Override
+	public List<Team> findAllByOrderByName() {
+		return repository.findAllByOrderByName();
 	}
 }
