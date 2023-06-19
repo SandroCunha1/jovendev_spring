@@ -2,6 +2,8 @@ package br.com.trier.springvespertino.services;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,8 @@ import org.springframework.test.context.jdbc.Sql;
 
 import br.com.trier.springvespertino.BaseTests;
 import br.com.trier.springvespertino.models.Championship;
+import br.com.trier.springvespertino.services.exceptions.IntegrityViolation;
+import br.com.trier.springvespertino.services.exceptions.ObjectNotFound;
 import jakarta.transaction.Transactional;
 
 @Transactional
@@ -34,7 +38,9 @@ class ChampionshipServiceTest extends BaseTests{
 	@DisplayName("Buscar por ID inválido")
 	@Sql({"classpath:/resources/sqls/campeonato.sql"})
 	void searchIdInvalid() {	
-		assertNull(campeonatoService.findById(4));
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		campeonatoService.findById(10));
+		assertEquals("O campeonato 10 não existe", ex.getMessage());
 	}
 	
 	@Test
@@ -42,6 +48,14 @@ class ChampionshipServiceTest extends BaseTests{
 	@Sql({"classpath:/resources/sqls/campeonato.sql"})
 	void searchAll() {	
 		assertEquals(3, campeonatoService.listAll().size());
+	}
+	
+	@Test
+	@DisplayName("Buscar todos com nenhum cadastro")
+	void searchAllWithNoUser() {	
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		campeonatoService.listAll());
+		assertEquals("Nenhum campeonato cadastrado", ex.getMessage());
 	}
 	
 	@Test
@@ -93,7 +107,9 @@ class ChampionshipServiceTest extends BaseTests{
 	@Sql({"classpath:/resources/sqls/campeonato.sql"})
 	void deleteChampionshipNoExist() {	
 		assertEquals(3, campeonatoService.listAll().size());
-		campeonatoService.delete(10);
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		campeonatoService.delete(10));
+		assertEquals("O campeonato 10 não existe", ex.getMessage());
 		assertEquals(3, campeonatoService.listAll().size());
 		assertEquals(1, campeonatoService.listAll().get(0).getId());
 	}
@@ -108,12 +124,24 @@ class ChampionshipServiceTest extends BaseTests{
 	}
 	
 	@Test
+	@DisplayName("Procura por ano não existente")
+	@Sql({"classpath:/resources/sqls/campeonato.sql"})
+	void searchByYearNonExist() {	
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		campeonatoService.findByYear(1997));
+		assertEquals("Nenhum campeonato em 1997", ex.getMessage());
+
+	}
+	
+	@Test
 	@DisplayName("Procura por descrição")
 	@Sql({"classpath:/resources/sqls/campeonato.sql"})
 	void findByDescription() {	
 		assertEquals(2, campeonatoService.findByDescriptionContaining("1").size());
 		assertEquals(3, campeonatoService.findByDescriptionContaining("f").size());
-		assertEquals(0, campeonatoService.findByDescriptionContaining("y").size());
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		campeonatoService.findByDescriptionContaining("y"));
+		assertEquals("Nenhum campeonato contem y", ex.getMessage());
 	}
 
 	
@@ -122,7 +150,23 @@ class ChampionshipServiceTest extends BaseTests{
 	@Sql({"classpath:/resources/sqls/campeonato.sql"})
 	void findByYearBetween() {	
 		assertEquals(2, campeonatoService.findByYearBetween(1990,1991).size());
-		assertEquals(1, campeonatoService.findByYearBetween(1980,1990).size());
-		assertEquals(0, campeonatoService.findByYearBetween(2000,2010).size());
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		campeonatoService.findByYearBetween(2000,2010));
+		assertEquals("Nenhum campeonato entre 2000 e 2010", ex.getMessage());
+	}
+	
+	
+	@Test
+	@DisplayName("Procura por ano entre integrity violation ano<1990 ou ano>ano atual + 1")
+	@Sql({"classpath:/resources/sqls/campeonato.sql"})
+	void findByYearBetweenViolation() {	
+		var ex = assertThrows(IntegrityViolation.class, () ->
+		campeonatoService.findByYearBetween(1980,1990));
+		assertEquals("O campeonato deve estar ente 1990 e %s".formatted(LocalDate.now().plusYears(1).getYear()), ex.getMessage());
+		
+		ex = assertThrows(IntegrityViolation.class, () ->
+		campeonatoService.findByYearBetween(1990,2990));
+		assertEquals("O campeonato deve estar ente 1990 e %s".formatted(LocalDate.now().plusYears(1).getYear()), ex.getMessage());
+
 	}
 }

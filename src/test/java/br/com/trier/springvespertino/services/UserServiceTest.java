@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import br.com.trier.springvespertino.BaseTests;
 import br.com.trier.springvespertino.models.User;
+import br.com.trier.springvespertino.services.exceptions.IntegrityViolation;
+import br.com.trier.springvespertino.services.exceptions.ObjectNotFound;
 import jakarta.transaction.Transactional;
 
 @Transactional
@@ -31,7 +33,9 @@ class UserServiceTest extends BaseTests {
 	@DisplayName("Buscar por ID inválido")
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
 	void searchIdInvalid() {	
-		assertNull(userService.findById(4));
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		userService.delete(4));
+		assertEquals("O usuário 4 não existe", ex.getMessage());
 	}
 	
 	@Test
@@ -39,6 +43,14 @@ class UserServiceTest extends BaseTests {
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
 	void searchAll() {	
 		assertEquals(3, userService.listAll().size());
+	}
+	
+	@Test
+	@DisplayName("Buscar todos com nenhum cadastro")
+	void searchAllWithNoUser() {	
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		userService.listAll());
+		assertEquals("Nenhum usuário cadastrado", ex.getMessage());
 	}
 	
 	@Test
@@ -51,6 +63,17 @@ class UserServiceTest extends BaseTests {
 		assertEquals("Sandro", usuario.getName());
 		assertEquals("sandrocunha@gmail.com", usuario.getEmail());
 		assertEquals("1234", usuario.getPassword());	
+	}
+	
+	@Test
+	@DisplayName("Insert novo usuario com email duplicado")
+	@Sql({"classpath:/resources/sqls/usuario.sql"})
+	void insertWithSameEmail() {	
+		User usuario2 = new User(null, "João", "sandro1@gmail.com", "1234");
+		var ex = assertThrows(IntegrityViolation.class, () ->
+		userService.insert(usuario2));
+		assertEquals("Email já existente : sandro1@gmail.com", ex.getMessage());
+
 	}
 	
 	@Test
@@ -74,8 +97,23 @@ class UserServiceTest extends BaseTests {
 	
 	@Test
 	@DisplayName("Update usuario não existente")
+	void updateInvalid() {
+		User usuario = new User(1, "Sandro", "sandrocunha@gmail.com", "1234");
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		userService.update(usuario));
+		assertEquals("O usuário 1 não existe", ex.getMessage());
+		
+	}
+	
+	@Test
+	@DisplayName("Update usuario com email cadastrado")
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
-	void updateInvalid() {	 	
+	void updateInvalidSameEmail() {
+		User usuario = new User(1, "Sandro", "sandro2@gmail.com", "1234");
+		var ex = assertThrows(IntegrityViolation.class, () ->
+		userService.update(usuario));
+		assertEquals("Email já existente : sandro2@gmail.com", ex.getMessage());
+		
 	}
 	
 	@Test
@@ -93,7 +131,9 @@ class UserServiceTest extends BaseTests {
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
 	void deleteUserNoExist() {	
 		assertEquals(3, userService.listAll().size());
-		userService.delete(10);
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		userService.delete(10));
+		assertEquals("O usuário 10 não existe", ex.getMessage());
 		assertEquals(3, userService.listAll().size());
 		assertEquals(1, userService.listAll().get(0).getId());
 	}
@@ -105,7 +145,10 @@ class UserServiceTest extends BaseTests {
 		assertEquals(3, userService.findByNameStartsWithIgnoreCase("s").size());
 		assertEquals(3, userService.findByNameStartsWithIgnoreCase("Sandro").size());
 		assertEquals(1, userService.findByNameStartsWithIgnoreCase("Sandro1").size());
-		assertEquals(0, userService.findByNameStartsWithIgnoreCase("A").size());
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		userService.findByNameStartsWithIgnoreCase("A").size());
+		assertEquals("Nenhum usário inicia com A", ex.getMessage());
+	}
 	}
 	
 	
@@ -115,4 +158,4 @@ class UserServiceTest extends BaseTests {
 	
 	
 
-}
+

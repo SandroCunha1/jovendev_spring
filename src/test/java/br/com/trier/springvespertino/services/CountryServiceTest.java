@@ -9,6 +9,8 @@ import org.springframework.test.context.jdbc.Sql;
 
 import br.com.trier.springvespertino.BaseTests;
 import br.com.trier.springvespertino.models.Country;
+import br.com.trier.springvespertino.services.exceptions.IntegrityViolation;
+import br.com.trier.springvespertino.services.exceptions.ObjectNotFound;
 import jakarta.transaction.Transactional;
 
 @Transactional
@@ -32,7 +34,9 @@ class CountryServiceTest extends BaseTests{
 	@DisplayName("Buscar por ID inválido")
 	@Sql({"classpath:/resources/sqls/pais.sql"})
 	void searchIdInvalid() {	
-		assertNull(countryService.findById(5));
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		countryService.findById(10));
+		assertEquals("O país 10 não existe", ex.getMessage());
 	}
 	
 	@Test
@@ -43,6 +47,14 @@ class CountryServiceTest extends BaseTests{
 	}
 	
 	@Test
+	@DisplayName("Buscar todos com nenhum cadastro")
+	void searchAllWithNoUser() {	
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		countryService.listAll());
+		assertEquals("Nenhum país cadastrado", ex.getMessage());
+	}
+	
+	@Test
 	@DisplayName("Insert novo pais")
 	void insert() {	
 		Country pais = new Country(null, "insert");
@@ -50,6 +62,16 @@ class CountryServiceTest extends BaseTests{
 		assertEquals(1, countryService.listAll().size());
 		assertEquals(1, pais.getId());
 		assertEquals("insert", pais.getName());	
+	}
+	
+	@Test
+	@DisplayName("Insert novo pais com nome duplicado")
+	@Sql({"classpath:/resources/sqls/pais.sql"})
+	void insertWithSameName() {	
+		Country pais = new Country(null, "Irlanda");
+		var ex = assertThrows(IntegrityViolation.class, () ->
+		countryService.insert(pais));
+		assertEquals("Nome já cadastrado : Irlanda", ex.getMessage());
 	}
 	
 	@Test
@@ -70,7 +92,11 @@ class CountryServiceTest extends BaseTests{
 	@Test
 	@DisplayName("Update pais não existente")
 	@Sql({"classpath:/resources/sqls/pais.sql"})
-	void updateInvalid() {	 	
+	void updateInvalid() {
+		Country pais = new Country(10, "ABC");
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		countryService.update(pais));
+		assertEquals("O país 10 não existe", ex.getMessage());
 	}
 	
 	@Test
@@ -88,7 +114,9 @@ class CountryServiceTest extends BaseTests{
 	@Sql({"classpath:/resources/sqls/pais.sql"})
 	void deleteCountryNoExist() {	
 		assertEquals(4, countryService.listAll().size());
-		countryService.delete(10);
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		countryService.delete(10));
+		assertEquals("O país 10 não existe", ex.getMessage());
 		assertEquals(4, countryService.listAll().size());
 		assertEquals(1, countryService.listAll().get(0).getId());
 	}
@@ -99,7 +127,10 @@ class CountryServiceTest extends BaseTests{
 	void searchByName() {	
 		assertEquals(1, countryService.findByNameStartsWithIgnoreCase("br").size());
 		assertEquals(2, countryService.findByNameStartsWithIgnoreCase("i").size());
-		assertEquals(0, countryService.findByNameStartsWithIgnoreCase("x").size());
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		countryService.findByNameStartsWithIgnoreCase("x"));
+		assertEquals("Nenhum país inicia com x", ex.getMessage());
+		
 	}
 	
 	@Test

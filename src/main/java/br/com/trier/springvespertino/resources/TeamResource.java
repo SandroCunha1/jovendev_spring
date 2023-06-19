@@ -23,40 +23,34 @@ public class TeamResource {
 	
 	@PostMapping
 	public ResponseEntity<Team> insert(@RequestBody Team team) {
-		Team newTeam = service.insert(team);
-		return newTeam!= null ? ResponseEntity.ok(newTeam) : ResponseEntity.noContent().build();
+		return ResponseEntity.ok(service.insert(team));
 	}
 	
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Team> findById(@PathVariable Integer id) {
-		Team newTeam = service.findById(id);
-		return newTeam!= null ? ResponseEntity.ok(newTeam) : ResponseEntity.noContent().build();
+		return ResponseEntity.ok(service.findById(id));
 	}
 	
 	@GetMapping
 	public ResponseEntity<List<Team>> listAll() {
-		List<Team> newTeam = service.listAll();
-		return newTeam.size() > 0 ?  ResponseEntity.ok(newTeam) : ResponseEntity.noContent().build();
+		return ResponseEntity.ok(service.listAll());
 	}
 	
 	@GetMapping("/name/{name}")
 	public ResponseEntity<List<Team>> findByNameStartsWithIgnoreCase(@PathVariable String name) {
-		List<Team> lista = service.findByNameStartsWithIgnoreCase(name);
-		return lista.size() > 0 ?  ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
+		return ResponseEntity.ok(service.findByNameStartsWithIgnoreCase(name));
 	}
 	
 	@GetMapping("/name")
-	public ResponseEntity<List<Team>> findAllByOrderByName(@PathVariable Integer id) {
-		List<Team> lista = service.findAllByOrderByName();
-		return lista.size() > 0 ?  ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
+	public ResponseEntity<List<Team>> findAllByOrderByName() {
+		return ResponseEntity.ok(service.findAllByOrderByName());
 	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<Team> update(@PathVariable Integer id, @RequestBody Team team) {
 		team.setId(id);
-		team = service.update(team);
-		return team!= null ? ResponseEntity.ok(team) : ResponseEntity.noContent().build();
+		return ResponseEntity.ok(service.update(team));
 	}
 	
 	@DeleteMapping("/{id}")

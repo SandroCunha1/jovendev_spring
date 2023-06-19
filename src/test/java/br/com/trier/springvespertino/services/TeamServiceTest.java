@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.jdbc.Sql;
 import br.com.trier.springvespertino.BaseTests;
 import br.com.trier.springvespertino.models.Team;
+import br.com.trier.springvespertino.services.exceptions.IntegrityViolation;
+import br.com.trier.springvespertino.services.exceptions.ObjectNotFound;
 import jakarta.transaction.Transactional;
 
 @Transactional
@@ -30,7 +32,9 @@ class TeamServiceTest extends BaseTests{
 	@DisplayName("Buscar por ID inválido")
 	@Sql({"classpath:/resources/sqls/time.sql"})
 	void searchIdInvalid() {	
-		assertNull(timeService.findById(4));
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		timeService.findById(10));
+		assertEquals("A equipe 10 não existe", ex.getMessage());
 	}
 	
 	@Test
@@ -38,6 +42,14 @@ class TeamServiceTest extends BaseTests{
 	@Sql({"classpath:/resources/sqls/time.sql"})
 	void searchAll() {	
 		assertEquals(3, timeService.listAll().size());
+	}
+	
+	@Test
+	@DisplayName("Buscar todos com nenhum cadastro")
+	void searchAllWithNoTeam() {	
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		timeService.listAll());
+		assertEquals("Nenhuma equipe cadastrada", ex.getMessage());
 	}
 	
 	@Test
@@ -49,6 +61,18 @@ class TeamServiceTest extends BaseTests{
 		assertEquals(1, time.getId());
 		assertEquals("insert", time.getName());	
 	}
+	
+	@Test
+	@DisplayName("Insert novo time com nome duplicado")
+	@Sql({"classpath:/resources/sqls/time.sql"})
+	void insertWithSameEmail() {	
+		Team time = new Team(null, "Ferrari");
+		var ex = assertThrows(IntegrityViolation.class, () ->
+		timeService.insert(time));
+		assertEquals("Nome já cadastrado : Ferrari", ex.getMessage());
+
+	}
+	
 	
 	@Test
 	@DisplayName("Update time")
@@ -69,6 +93,10 @@ class TeamServiceTest extends BaseTests{
 	@DisplayName("Update time não existente")
 	@Sql({"classpath:/resources/sqls/time.sql"})
 	void updateInvalid() {	 	
+		Team time = new Team(10, "ABC");
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		timeService.update(time));
+		assertEquals("A equipe 10 não existe", ex.getMessage());
 	}
 	
 	@Test
@@ -86,7 +114,9 @@ class TeamServiceTest extends BaseTests{
 	@Sql({"classpath:/resources/sqls/time.sql"})
 	void deleteTeamNoExist() {	
 		assertEquals(3, timeService.listAll().size());
-		timeService.delete(10);
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		timeService.delete(10));
+		assertEquals("A equipe 10 não existe", ex.getMessage());		
 		assertEquals(3, timeService.listAll().size());
 		assertEquals(1, timeService.listAll().get(0).getId());
 	}
@@ -97,7 +127,9 @@ class TeamServiceTest extends BaseTests{
 	void searchByName() {	
 		assertEquals(1, timeService.findByNameStartsWithIgnoreCase("f").size());
 		assertEquals(2, timeService.findByNameStartsWithIgnoreCase("m").size());
-		assertEquals(0, timeService.findByNameStartsWithIgnoreCase("A").size());
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		timeService.findByNameStartsWithIgnoreCase("A"));
+		assertEquals("Nenhuma equipe inicia com A", ex.getMessage());
 	}
 	
 	@Test

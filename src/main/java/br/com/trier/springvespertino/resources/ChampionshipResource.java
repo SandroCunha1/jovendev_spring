@@ -23,46 +23,38 @@ public class ChampionshipResource {
 	
 	@PostMapping
 	public ResponseEntity<Championship> insert(@RequestBody Championship championship) {
-		Championship newChampionship = service.insert(championship);
-		return newChampionship!= null ? ResponseEntity.ok(newChampionship) : ResponseEntity.noContent().build();
+		return ResponseEntity.ok(service.insert(championship));
 	}
 	
 	
 	@GetMapping("/{id}")
 	public ResponseEntity<Championship> findById(@PathVariable Integer id) {
-		Championship newChampionship = service.findById(id);
-		return newChampionship!= null ? ResponseEntity.ok(newChampionship) : ResponseEntity.noContent().build();
+		return ResponseEntity.ok(service.findById(id));
 	}
-	
 	@GetMapping
 	public ResponseEntity<List<Championship>> listAll() {
-		List<Championship> newChampionship = service.listAll();
-		return newChampionship.size() > 0 ?  ResponseEntity.ok(newChampionship) : ResponseEntity.noContent().build();
+		return ResponseEntity.ok(service.listAll());
 	}
 	
 	@GetMapping("/year/{year}")
 	public ResponseEntity<List<Championship>> findByYear(@PathVariable Integer year) {
-		List<Championship> newChampionship = service.findByYear(year);
-		return newChampionship.size() > 0 ?  ResponseEntity.ok(newChampionship) : ResponseEntity.noContent().build();
+		return ResponseEntity.ok(service.findByYear(year));
 	}
 	
 	@GetMapping("/year/{num1}/{num2}")
 	public ResponseEntity<List<Championship>> findByYearBetween(@PathVariable Integer num1, @PathVariable Integer num2){
-		List<Championship> newChampionship = service.findByYearBetween(num1, num2);
-		return newChampionship.size() > 0 ?  ResponseEntity.ok(newChampionship) : ResponseEntity.noContent().build();
+		return ResponseEntity.ok(service.findByYearBetween(num1,num2));
 	}
 
 	@GetMapping("/description/{description}")
 	public ResponseEntity<List<Championship>> findByDescriptionContaining(@PathVariable String description) {
-		List<Championship> newChampionship = service.findByDescriptionContaining(description);
-		return newChampionship.size() > 0 ?  ResponseEntity.ok(newChampionship) : ResponseEntity.noContent().build();
+		return ResponseEntity.ok(service.findByDescriptionContaining(description));
 	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<Championship> update(@PathVariable Integer id, @RequestBody Championship championship) {
 		championship.setId(id);
-		championship = service.update(championship);
-		return championship!= null ? ResponseEntity.ok(championship) : ResponseEntity.noContent().build();
+		return ResponseEntity.ok(service.update(championship));
 	}
 	
 	@DeleteMapping("/{id}")
