@@ -1,15 +1,15 @@
 INSERT INTO country
-(name_country)
-VALUES('Brasil');
+(id_country, name_country)
+VALUES(1, 'Brasil');
 
 INSERT INTO country
-(name_country)
-VALUES('Estados Unidos');
+(id_country, name_country)
+VALUES(2, 'Estados Unidos');
 
 INSERT INTO country
-(name_country)
-VALUES('Reino Unido');
+(id_country, name_country)
+VALUES(3, 'Irlanda');
 
 INSERT INTO country
-(name_country)
-VALUES('Holanda');
+(id_country, name_country)
+VALUES(4, 'Inglaterra');

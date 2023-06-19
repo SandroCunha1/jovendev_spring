@@ -20,4 +20,6 @@ public interface ChampionshipService {
 	List<Championship> findByYear(Integer year);
 	
     List<Championship> findByDescriptionContaining(String description);
+    
+    List<Championship> findByYearBetween(Integer num1, Integer num2);
 }

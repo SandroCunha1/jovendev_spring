@@ -102,7 +102,7 @@ class ChampionshipServiceTest extends BaseTests{
 	@DisplayName("Procura por ano")
 	@Sql({"classpath:/resources/sqls/campeonato.sql"})
 	void searchByYear() {	
-		assertEquals(2, campeonatoService.findByYear(1990).size());
+		assertEquals(1, campeonatoService.findByYear(1990).size());
 		assertEquals(1, campeonatoService.findByYear(1991).size());
 
 	}
@@ -116,4 +116,13 @@ class ChampionshipServiceTest extends BaseTests{
 		assertEquals(0, campeonatoService.findByDescriptionContaining("y").size());
 	}
 
+	
+	@Test
+	@DisplayName("Procura por ano entre")
+	@Sql({"classpath:/resources/sqls/campeonato.sql"})
+	void findByYearBetween() {	
+		assertEquals(2, campeonatoService.findByYearBetween(1990,1991).size());
+		assertEquals(1, campeonatoService.findByYearBetween(1980,1990).size());
+		assertEquals(0, campeonatoService.findByYearBetween(2000,2010).size());
+	}
 }

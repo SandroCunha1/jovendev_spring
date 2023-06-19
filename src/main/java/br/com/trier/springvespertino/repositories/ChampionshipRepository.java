@@ -9,4 +9,5 @@ import br.com.trier.springvespertino.models.Championship;
 public interface ChampionshipRepository extends JpaRepository<Championship, Integer> {
 	    List<Championship> findByYear(Integer year);
 	    List<Championship> findByDescriptionContainingIgnoreCase(String description);
+	    List<Championship> findByYearBetween(Integer num1, Integer num2);
 }

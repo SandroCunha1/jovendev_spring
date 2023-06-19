@@ -41,8 +41,8 @@ public class CountryResource {
 	}
 	
 	@GetMapping("/name")
-	public ResponseEntity<List<Country>> findAllCountriesOrderedByName() {
-		List<Country> lista = service.findAllCountriesOrderedByName();
+	public ResponseEntity<List<Country>> findAllByOrderByName() {
+		List<Country> lista = service.findAllByOrderByName();
 		return lista.size() > 0 ?  ResponseEntity.ok(lista) : ResponseEntity.noContent().build();
 	}
 	

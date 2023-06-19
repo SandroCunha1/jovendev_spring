@@ -54,6 +54,11 @@ public class ChampionshipServiceImpl implements ChampionshipService {
 	public List<Championship> findByDescriptionContaining(String description) {
 		return repository.findByDescriptionContainingIgnoreCase(description);
 	}
+
+	@Override
+	public List<Championship> findByYearBetween(Integer num1, Integer num2) {
+		return repository.findByYearBetween(num1, num2);
+	}
 	
 	
 }

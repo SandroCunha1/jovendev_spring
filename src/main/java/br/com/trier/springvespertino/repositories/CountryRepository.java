@@ -8,7 +8,7 @@ import br.com.trier.springvespertino.models.Country;
 
 public interface CountryRepository extends JpaRepository<Country, Integer> {
 	
-	List<Country> findAllCountriesOrderedByName();
+	List<Country> findAllByOrderByName();
 	List<Country> findByNameStartsWithIgnoreCase(String name);
 	
 }

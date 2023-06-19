@@ -46,12 +46,12 @@ public class CountryServiceImpl implements CountryService {
 	}
 
 	@Override
-	public List<Country> findAllCountriesOrderedByName() {
-		return repository.findAllCountriesOrderedByName();
+	public List<Country> findByNameStartsWithIgnoreCase(String name) {
+		return repository.findByNameStartsWithIgnoreCase(name);
 	}
 
 	@Override
-	public List<Country> findByNameStartsWithIgnoreCase(String name) {
-		return findByNameStartsWithIgnoreCase(name);
+	public List<Country> findAllByOrderByName() {
+		return repository.findAllByOrderByName();
 	}
 }

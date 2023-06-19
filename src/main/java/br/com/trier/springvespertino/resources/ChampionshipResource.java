@@ -41,13 +41,19 @@ public class ChampionshipResource {
 	}
 	
 	@GetMapping("/year/{year}")
-	public ResponseEntity<List<Championship>> findByYear(Integer year) {
+	public ResponseEntity<List<Championship>> findByYear(@PathVariable Integer year) {
 		List<Championship> newChampionship = service.findByYear(year);
+		return newChampionship.size() > 0 ?  ResponseEntity.ok(newChampionship) : ResponseEntity.noContent().build();
+	}
+	
+	@GetMapping("/year/{num1}/{num2}")
+	public ResponseEntity<List<Championship>> findByYearBetween(@PathVariable Integer num1, @PathVariable Integer num2){
+		List<Championship> newChampionship = service.findByYearBetween(num1, num2);
 		return newChampionship.size() > 0 ?  ResponseEntity.ok(newChampionship) : ResponseEntity.noContent().build();
 	}
 
 	@GetMapping("/description/{description}")
-	public ResponseEntity<List<Championship>> findByDescriptionContaining(String description) {
+	public ResponseEntity<List<Championship>> findByDescriptionContaining(@PathVariable String description) {
 		List<Championship> newChampionship = service.findByDescriptionContaining(description);
 		return newChampionship.size() > 0 ?  ResponseEntity.ok(newChampionship) : ResponseEntity.noContent().build();
 	}
