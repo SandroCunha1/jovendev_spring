@@ -52,6 +52,9 @@ public class ChampionshipServiceImpl implements ChampionshipService {
 	}
 	
 	private void validYear(Integer year) {
+		if(year == null) {
+			throw new IntegrityViolation("O ano não pode ser nulo!");
+		}
 		if(year < 1990 || year > LocalDate.now().plusYears(1).getYear()) {
 			throw new IntegrityViolation("O campeonato deve estar ente 1990 e %s".formatted(LocalDate.now().plusYears(1).getYear()));
 		}

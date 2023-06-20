@@ -18,7 +18,7 @@ public class TeamServiceImpl implements TeamService {
 	
 	private void findByName(Team team) {
 		Team busca = repository.findByName(team.getName());
-		if(busca != null && busca.getId() != team.getId()) {
+		if(busca != null && !busca.getId().equals(team.getId())) {
 			throw new IntegrityViolation("Nome já cadastrado : %s".formatted(team.getName()));
 		}
 	}

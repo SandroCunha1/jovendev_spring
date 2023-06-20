@@ -1,3 +1,5 @@
+delete from user_race;
+
 INSERT INTO user_race
 (id_user, email_user, name_user, password_user)
 VALUES(1, 'sandro1@gmail.com', 'Sandro1', '123');

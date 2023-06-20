@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import br.com.trier.springvespertino.models.User;
+import br.com.trier.springvespertino.models.dto.UserDTO;
 import br.com.trier.springvespertino.services.UserService;
 
 
@@ -22,30 +23,37 @@ public class UserResource {
 	private UserService service;
 	
 	@PostMapping
-	public ResponseEntity<User> insert(@RequestBody User user) {
-		return ResponseEntity.ok(service.insert(user));
+	public ResponseEntity<UserDTO> insert(@RequestBody UserDTO user) {
+		return ResponseEntity.ok(service.insert(new User(user)).toDTO());
 	}
 	
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<User> findById(@PathVariable Integer id) {
-		return ResponseEntity.ok(service.findById(id));
+	public ResponseEntity<UserDTO> findById(@PathVariable Integer id) {
+		return ResponseEntity.ok(service.findById(id).toDTO());
 	}
 	
 	@GetMapping
-	public ResponseEntity<List<User>> listAll() {
-		return ResponseEntity.ok(service.listAll());
+	public ResponseEntity<List<UserDTO>> listAll() {
+		return ResponseEntity.ok(service.listAll()
+									.stream()
+									.map(user -> user.toDTO())
+									.toList());
 	}
 	
 	@GetMapping("/name/{name}")
-	public ResponseEntity<List<User>> findByNameStartsWithIgnoreCase(@PathVariable String name) {
-		return ResponseEntity.ok(service.findByNameStartsWithIgnoreCase(name));
+	public ResponseEntity<List<UserDTO>> findByNameStartsWithIgnoreCase(@PathVariable String name) {
+		return ResponseEntity.ok(service.findByNameStartsWithIgnoreCase(name)
+									.stream()
+									.map(user -> user.toDTO())
+									.toList());
 	}
 	
 	@PutMapping("/{id}")
-	public ResponseEntity<User> update(@PathVariable Integer id, @RequestBody User user) {
+	public ResponseEntity<UserDTO> update(@PathVariable Integer id, @RequestBody UserDTO userDTO) {
+		User user = new User(userDTO);
 		user.setId(id);
-		return ResponseEntity.ok(service.update(user));
+		return ResponseEntity.ok(service.update(user).toDTO());
 	}
 	
 	@DeleteMapping("/{id}")

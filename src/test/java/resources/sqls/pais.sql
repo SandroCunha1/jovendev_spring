@@ -1,3 +1,5 @@
+delete from country;
+
 INSERT INTO country
 (id_country, name_country)
 VALUES(1, 'Brasil');
