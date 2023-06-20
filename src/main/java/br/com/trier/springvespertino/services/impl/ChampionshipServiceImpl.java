@@ -41,6 +41,7 @@ public class ChampionshipServiceImpl implements ChampionshipService {
 
 	@Override
 	public Championship update(Championship championship) {
+		findById(championship.getId());
 		validYear(championship.getYear());
 		return repository.save(championship);
 	}

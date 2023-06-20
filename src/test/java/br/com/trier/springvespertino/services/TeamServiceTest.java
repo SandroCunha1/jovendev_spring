@@ -100,6 +100,16 @@ class TeamServiceTest extends BaseTests{
 	}
 	
 	@Test
+	@DisplayName("Update time com nome igual")
+	@Sql({"classpath:/resources/sqls/time.sql"})
+	void updateWithSameName() {	 	
+		Team time = new Team(1, "Mercedes");
+		var ex = assertThrows(IntegrityViolation.class, () ->
+		timeService.update(time));
+		assertEquals("Nome já cadastrado : Mercedes", ex.getMessage());
+	}
+	
+	@Test
 	@DisplayName("Delete usuário")
 	@Sql({"classpath:/resources/sqls/time.sql"})
 	void deleteTeam() {	

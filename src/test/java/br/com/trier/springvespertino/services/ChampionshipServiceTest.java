@@ -70,6 +70,15 @@ class ChampionshipServiceTest extends BaseTests{
 	}
 	
 	@Test
+	@DisplayName("Insert novo campeonato ano invalido <1990 || >anoAtual+1")
+	void insertIvalid() {	
+		Championship campeonato = new Championship(null, "insert", 1980);
+		var ex = assertThrows(IntegrityViolation.class, () ->
+		campeonatoService.insert(campeonato));
+		assertEquals("O campeonato deve estar ente 1990 e %s".formatted(LocalDate.now().plusYears(1).getYear()), ex.getMessage());
+	}
+	
+	@Test
 	@DisplayName("Update campeonato")
 	@Sql({"classpath:/resources/sqls/campeonato.sql"})
 	void update() {	
@@ -90,6 +99,10 @@ class ChampionshipServiceTest extends BaseTests{
 	@DisplayName("Update campeonato não existente")
 	@Sql({"classpath:/resources/sqls/campeonato.sql"})
 	void updateInvalid() {	 	
+		Championship campeonato = new Championship(10, "update", 1990);
+		var ex = assertThrows(ObjectNotFound.class, () ->
+		campeonatoService.update(campeonato));
+		assertEquals("O campeonato 10 não existe", ex.getMessage());
 	}
 	
 	@Test
@@ -130,6 +143,16 @@ class ChampionshipServiceTest extends BaseTests{
 		var ex = assertThrows(ObjectNotFound.class, () ->
 		campeonatoService.findByYear(1997));
 		assertEquals("Nenhum campeonato em 1997", ex.getMessage());
+
+	}
+	
+	@Test
+	@DisplayName("Procura por ano inválido")
+	@Sql({"classpath:/resources/sqls/campeonato.sql"})
+	void searchByYearInvalid() {	
+		var ex = assertThrows(IntegrityViolation.class, () ->
+		campeonatoService.findByYear(1980));
+		assertEquals("O campeonato deve estar ente 1990 e %s".formatted(LocalDate.now().plusYears(1).getYear()), ex.getMessage());
 
 	}
 	

@@ -100,6 +100,16 @@ class CountryServiceTest extends BaseTests{
 	}
 	
 	@Test
+	@DisplayName("Update novo pais com nome duplicado")
+	@Sql({"classpath:/resources/sqls/pais.sql"})
+	void updateWithSameName() {	
+		Country pais = new Country(1, "Irlanda");
+		var ex = assertThrows(IntegrityViolation.class, () ->
+		countryService.update(pais));
+		assertEquals("Nome já cadastrado : Irlanda", ex.getMessage());
+	}
+	
+	@Test
 	@DisplayName("Delete usuário")
 	@Sql({"classpath:/resources/sqls/pais.sql"})
 	void deleteCountry() {	
