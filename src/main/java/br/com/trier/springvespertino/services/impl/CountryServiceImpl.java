@@ -30,6 +30,7 @@ public class CountryServiceImpl implements CountryService {
 
 	@Override
 	public Country insert(Country country) {
+		
 		findByName(country);
 		return repository.save(country);
 	}
