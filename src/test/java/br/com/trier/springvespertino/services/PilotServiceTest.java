@@ -3,6 +3,8 @@ package br.com.trier.springvespertino.services;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -59,6 +61,7 @@ class PilotServiceTest extends BaseTests {
 
 	@Test
 	@DisplayName("Buscar todos com nenhum cadastro")
+	@Sql({"classpath:/resources/sqls/limpa_tabelas.sql"})
 	void searchAllWithNoPilot() {
 		var ex = assertThrows(ObjectNotFound.class, () -> pilotService.listAll());
 		assertEquals("Nenhum piloto cadastrado", ex.getMessage());
@@ -66,6 +69,9 @@ class PilotServiceTest extends BaseTests {
 
 	@Test
 	@DisplayName("Insert novo piloto")
+	@Sql({"classpath:/resources/sqls/limpa_tabelas.sql"})
+	@Sql({"classpath:/resources/sqls/pais.sql"})
+	@Sql({"classpath:/resources/sqls/time.sql"})
 	void insert() {
 		Pilot pilot = new Pilot(null, "Jane Smith", country, team);
 		pilotService.insert(pilot);
@@ -77,7 +83,6 @@ class PilotServiceTest extends BaseTests {
 
 	@Test
 	@DisplayName("Update piloto")
-	@Sql({ "classpath:/resources/sqls/piloto.sql" })
 	void update() {
 		Pilot pilot = pilotService.findById(1);
 		assertNotNull(pilot);
@@ -92,7 +97,6 @@ class PilotServiceTest extends BaseTests {
 
 	@Test
 	@DisplayName("Update piloto não existente")
-	@Sql({ "classpath:/resources/sqls/piloto.sql" })
 	void updateInvalid() {
 		Pilot pilot = new Pilot(10, "Invalid Pilot",country, team );
 		var ex = assertThrows(ObjectNotFound.class, () -> pilotService.update(pilot));
@@ -101,7 +105,6 @@ class PilotServiceTest extends BaseTests {
 
 	@Test
 	@DisplayName("Delete piloto")
-	@Sql({ "classpath:/resources/sqls/piloto.sql" })
 	void delete() {
 		Pilot pilot = pilotService.findById(1);
 		assertNotNull(pilot);
@@ -115,7 +118,53 @@ class PilotServiceTest extends BaseTests {
 	@Test
 	@DisplayName("Delete piloto não existente")
 	void deleteInvalid() {
-		var ex = assertThrows(ObjectNotFound.class, () -> pilotService.delete(1));
+		var ex = assertThrows(ObjectNotFound.class, () -> pilotService.delete(10));
 		assertEquals("O piloto 10 não existe", ex.getMessage());
 	}
+	
+	@Test
+	@DisplayName("Encontra pilotos por nome")
+	void findByNameStartsWithIgnoreCase() {
+		List<Pilot> lista = pilotService.findByNameStartsWithIgnoreCase("J");
+		assertEquals(2, lista.size());
+	}
+	
+	@Test
+	@DisplayName("Encontra pilotos por nome sem nomes iguais")
+	void findByNameStartsWithIgnoreCaseInvalid() {
+		var ex = assertThrows(ObjectNotFound.class, () -> pilotService.findByNameStartsWithIgnoreCase("y"));
+		assertEquals("Nenhum piloto cadastrada com nome: y", ex.getMessage());
+	}
+
+	@Test
+	@DisplayName("Encontra pilotos por país")
+	void findByCountryOrderByName() {
+		List<Pilot> lista = pilotService.findByCountryOrderByName(country);
+		assertEquals(1, lista.size());
+	}
+	
+	@Test
+	@DisplayName("Encontra pilotos por país sem nenhum com este país")
+	@Sql({"classpath:/resources/sqls/limpa_tabelas.sql"})
+	void findByCountryOrderByNameInvalid() {
+		var ex = assertThrows(ObjectNotFound.class, () -> pilotService.findByCountryOrderByName(country));
+		assertEquals("Nenhum piloto cadastrada no país : Brasil", ex.getMessage());
+	}
+
+
+	@Test
+	@DisplayName("Encontra pilotos por time")
+	void findByTeamOrderByName() {
+		List<Pilot> lista = pilotService.findByTeamOrderByName(team);
+		assertEquals(1, lista.size());
+	}
+	
+	@Test
+	@DisplayName("Encontra pilotos por time sem times encontrados")
+	@Sql({"classpath:/resources/sqls/limpa_tabelas.sql"})
+	void findByTeamOrderByNameInvalid() {
+		var ex = assertThrows(ObjectNotFound.class, () -> pilotService.findByTeamOrderByName(team));
+		assertEquals("Nenhum piloto cadastrado na equipe : Ferrari", ex.getMessage());
+	}
+
 }

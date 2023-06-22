@@ -79,6 +79,15 @@ class ChampionshipServiceTest extends BaseTests{
 	}
 	
 	@Test
+	@DisplayName("Insert novo campeonato ano nulo")
+	void insertNull() {	
+		Championship campeonato = new Championship(null, "insert", null);
+		var ex = assertThrows(IntegrityViolation.class, () ->
+		campeonatoService.insert(campeonato));
+		assertEquals("O ano não pode ser nulo!", ex.getMessage());
+	}
+	
+	@Test
 	@DisplayName("Update campeonato")
 	@Sql({"classpath:/resources/sqls/campeonato.sql"})
 	void update() {	
@@ -192,4 +201,6 @@ class ChampionshipServiceTest extends BaseTests{
 		assertEquals("O campeonato deve estar ente 1990 e %s".formatted(LocalDate.now().plusYears(1).getYear()), ex.getMessage());
 
 	}
+	
+	
 }

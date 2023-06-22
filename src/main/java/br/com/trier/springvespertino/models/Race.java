@@ -23,7 +23,7 @@ public class Race {
 	@Setter
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_runway")
+	@Column(name = "id_race")
 	private Integer id;
 	
 	@Column(name = "date")

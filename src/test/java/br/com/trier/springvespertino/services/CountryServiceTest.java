@@ -74,6 +74,8 @@ class CountryServiceTest extends BaseTests{
 		assertEquals("Nome já cadastrado : Irlanda", ex.getMessage());
 	}
 	
+	
+	
 	@Test
 	@DisplayName("Update pais")
 	@Sql({"classpath:/resources/sqls/pais.sql"})

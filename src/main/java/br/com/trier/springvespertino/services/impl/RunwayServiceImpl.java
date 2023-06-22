@@ -18,7 +18,7 @@ public class RunwayServiceImpl implements RunwayService{
 		
 	private void validateRunway(Runway runway) {
 		if(runway.getSize() == null || runway.getSize() <= 0) {
-			throw new IntegrityViolation("Tamanho da pista inálido");
+			throw new IntegrityViolation("Tamanho da pista inválido");
 		}
 	}
 		
@@ -76,9 +76,9 @@ public class RunwayServiceImpl implements RunwayService{
 
 	@Override
 	public List<Runway> findByCountryOrderBySizeDesc(Country country) {
-		List<Runway> lista = repository.findAll();
+		List<Runway> lista = repository.findByCountryOrderBySizeDesc(country);
 		if(lista.isEmpty()) {
-			throw new ObjectNotFound("Nenhuma pista cadastrada com o país: %s".formatted(country));
+			throw new ObjectNotFound("Nenhuma pista cadastrada com o país: %s".formatted(country.getName()));
 		}
 		return lista;
 	}
