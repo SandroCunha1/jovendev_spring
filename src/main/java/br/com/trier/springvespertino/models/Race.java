@@ -1,6 +1,9 @@
 package br.com.trier.springvespertino.models;
 
 import java.time.ZonedDateTime;
+
+import br.com.trier.springvespertino.models.dto.RaceDTO;
+import br.com.trier.springvespertino.utils.DateUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,5 +39,13 @@ public class Race {
 	@ManyToOne
 	@NotNull
 	private Championship championship;
+	
+	public Race(RaceDTO raceDTO, Runway runway, Championship championship) {
+		this(raceDTO.getId(), DateUtils.dateBrToZoneDate(raceDTO.getDate()), runway, championship);			
+	}
+	
+	public RaceDTO toDTO() {
+		return new RaceDTO(id, DateUtils.zoneDateToBrDate(date), runway.getId(), runway.getName(), championship.getId(), championship.getDescription());
+	}
 	
 }

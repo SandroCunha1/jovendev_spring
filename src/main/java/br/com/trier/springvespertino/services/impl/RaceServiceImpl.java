@@ -11,6 +11,7 @@ import br.com.trier.springvespertino.models.Race;
 import br.com.trier.springvespertino.models.Runway;
 import br.com.trier.springvespertino.repositories.RaceRepository;
 import br.com.trier.springvespertino.services.RaceService;
+import br.com.trier.springvespertino.services.exceptions.IntegrityViolation;
 import br.com.trier.springvespertino.services.exceptions.ObjectNotFound;
 import br.com.trier.springvespertino.utils.DateUtils;
 
@@ -21,13 +22,16 @@ public class RaceServiceImpl implements RaceService {
 	private RaceRepository repository;
 	
 	
-	/*
-	 * private void validDate(Race race) { if (championship == null ||
-	 * championship.getYear() == null || championship.getYear() !=
-	 * race.getDate().getYear()) { throw new
-	 * IntegrityViolation("Ano da corrida: %s Deve ser o mesmo ano do campeonato: %s "
-	 * .formatted(race.getDate().getYear(), championship.getYear())); } }
-	 */
+	private void validDate(Race race) {
+		Championship championship = race.getChampionship();
+		if (championship == null || championship.getYear() == null
+				|| championship.getYear() != race.getDate().getYear()) {
+			throw new IntegrityViolation("Ano da corrida: %s Deve ser o mesmo ano do campeonato: %s "
+					.formatted(race.getDate().getYear(), championship.getYear()));
+		}
+	}
+	  
+	  
 	
 	@Override
 	public Race findById(Integer id) {
@@ -37,7 +41,7 @@ public class RaceServiceImpl implements RaceService {
 
 	@Override
 	public Race insert(Race race) {
-		//validDate(race);
+		validDate(race);
 		return repository.save(race);
 	}
 
@@ -53,7 +57,7 @@ public class RaceServiceImpl implements RaceService {
 	@Override
 	public Race update(Race race) {
 		findById(race.getId());
-		//validDate(race);
+		validDate(race);
 		return repository.save(race);
 	}
 
