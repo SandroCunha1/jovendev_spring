@@ -1,8 +1,6 @@
 package br.com.trier.springvespertino.models;
 
 import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -39,12 +37,4 @@ public class Race {
 	@NotNull
 	private Championship championship;
 	
-	public Race(String zonedDateTime, Runway runway, Championship championship) {
-		this.runway = runway;
-		this.championship = championship;
-		DateTimeFormatter formatter  = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
-		ZonedDateTime zonedDate = ZonedDateTime.parse(zonedDateTime, formatter);
-		this.date = zonedDate;
-		
-	}
 }

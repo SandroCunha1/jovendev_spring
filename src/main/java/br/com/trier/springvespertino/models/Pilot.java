@@ -23,7 +23,7 @@ public class Pilot {
 	@Setter
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_runway")
+	@Column(name = "id_pilot")
 	private Integer id;
 	
 	

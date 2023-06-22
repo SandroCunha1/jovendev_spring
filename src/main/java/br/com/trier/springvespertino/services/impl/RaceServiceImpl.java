@@ -23,10 +23,14 @@ public class RaceServiceImpl implements RaceService {
 	@Autowired
 	private RaceRepository repository;
 	
+	@Autowired
+	private ChampionshipServiceImpl championshipService;
+	
 	private void validDate(Race race) {
-		if(! race.getChampionship().getYear().equals(race.getDate().getYear()) ) {
-			throw new IntegrityViolation("Ano da corrida deve ser no mesmo ano do campeonato");
-		}
+		Championship championship = championshipService.findById(race.getChampionship().getId()) ;
+	    if (championship == null || championship.getYear() == null || championship.getYear() != race.getDate().getYear()) {
+	        throw new IntegrityViolation("Ano da corrida: %s Deve ser o mesmo ano do campeonato: %s ".formatted(race.getDate().getYear(), championship.getYear()));
+	    }
 	}
 	
 	@Override

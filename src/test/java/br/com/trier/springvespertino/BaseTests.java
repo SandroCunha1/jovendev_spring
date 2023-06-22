@@ -6,10 +6,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.ActiveProfiles;
 import br.com.trier.springvespertino.services.ChampionshipService;
 import br.com.trier.springvespertino.services.CountryService;
+import br.com.trier.springvespertino.services.PilotService;
+import br.com.trier.springvespertino.services.RaceService;
+import br.com.trier.springvespertino.services.RunwayService;
 import br.com.trier.springvespertino.services.TeamService;
 import br.com.trier.springvespertino.services.UserService;
 import br.com.trier.springvespertino.services.impl.ChampionshipServiceImpl;
 import br.com.trier.springvespertino.services.impl.CountryServiceImpl;
+import br.com.trier.springvespertino.services.impl.PilotServiceImpl;
+import br.com.trier.springvespertino.services.impl.RaceServiceImpl;
+import br.com.trier.springvespertino.services.impl.RunwayServiceImpl;
 import br.com.trier.springvespertino.services.impl.TeamServiceImpl;
 import br.com.trier.springvespertino.services.impl.UserServiceImpl;
 
@@ -36,6 +42,21 @@ public class BaseTests {
 	@Bean
 	public ChampionshipService championshipService() {
 		return new ChampionshipServiceImpl();
+	}
+	
+	@Bean
+	public PilotService pilotService() {
+		return new PilotServiceImpl();
+	}
+	
+	@Bean
+	public RaceService raceService() {
+		return new RaceServiceImpl();
+	}
+	
+	@Bean
+	public RunwayService runwayService() {
+		return new RunwayServiceImpl();
 	}
 
 }

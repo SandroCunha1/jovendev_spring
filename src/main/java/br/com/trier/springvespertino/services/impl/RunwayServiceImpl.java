@@ -11,7 +11,7 @@ import br.com.trier.springvespertino.services.exceptions.IntegrityViolation;
 import br.com.trier.springvespertino.services.exceptions.ObjectNotFound;
 
 @Service
-public class RunwayServiceImp implements RunwayService{
+public class RunwayServiceImpl implements RunwayService{
 	
 		@Autowired
 		private RunwayRepository repository;
