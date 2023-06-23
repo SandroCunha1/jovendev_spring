@@ -88,7 +88,7 @@ public class RaceResource {
 	}
 	
 	@GetMapping("/championship/{id}")
-	public ResponseEntity<List<RaceDTO>> finfByChampionshipOrderByName(@PathVariable Integer id){
+	public ResponseEntity<List<RaceDTO>> findByChampionshipOrderByName(@PathVariable Integer id){
 		return ResponseEntity.ok(service.findByChampionshipOrderByDate(championshipService.findById(id))
 				.stream()
 				.map(race -> race.toDTO())
