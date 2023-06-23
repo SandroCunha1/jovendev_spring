@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import br.com.trier.springvespertino.models.Race;
 import br.com.trier.springvespertino.models.dto.RaceDTO;
@@ -56,22 +57,22 @@ public class RaceResource {
 		
 	}
 	
-	@DeleteMapping
+	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Integer id) {
 		service.delete(id);
 		return ResponseEntity.ok().build();
 	}
 	
-	@GetMapping("/date/{date}")
-	public ResponseEntity<List<RaceDTO>> findByDate(@PathVariable String date){
+	@GetMapping("/date")
+	public ResponseEntity<List<RaceDTO>> findByDate(@RequestParam("date") String date){
 		return ResponseEntity.ok(service.findByDate(date)
 				.stream()
 				.map(race -> race.toDTO())
 				.toList());
 	}
 	
-	@GetMapping("/date/{date1}/{date2}")
-	public ResponseEntity<List<RaceDTO>> findByDateBetween(@PathVariable String date1, @PathVariable String date2){
+	@GetMapping("/date/between")
+	public ResponseEntity<List<RaceDTO>> findByDateBetween(@RequestParam("date1") String date1, @RequestParam("date2") String date2){
 		return ResponseEntity.ok(service.findByDateBetween(date1, date2)
 				.stream()
 				.map(race -> race.toDTO())

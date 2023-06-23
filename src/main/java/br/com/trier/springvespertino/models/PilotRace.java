@@ -1,6 +1,7 @@
 package br.com.trier.springvespertino.models;
 
-import br.com.trier.springvespertino.models.dto.PilotDTO;
+import br.com.trier.springvespertino.models.dto.PilotRaceDTO;
+import br.com.trier.springvespertino.utils.DateUtils;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,32 +19,32 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(of = "id")
-@Entity(name="pilot")
-public class Pilot {
+@Entity(name="pilot_race")
+public class PilotRace {
 
 	@Setter
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "id_pilot")
+	@Column(name = "id_p_r")
 	private Integer id;
 	
-	
-	@Column(name = "name")
-	private String name;
-	
-	@ManyToOne
-	@NotNull
-	private Country country;
+	@Column(name = "placement")
+	private Integer placement;
 	
 	@ManyToOne
 	@NotNull
-	private Team team;
+	private Pilot pilot;
 	
-	public Pilot(PilotDTO pilotDTO, Country country, Team team) {
-		this(pilotDTO.getId(), pilotDTO.getName(), country, team);			
+	@ManyToOne
+	@NotNull
+	private Race race;
+	
+	public PilotRace(PilotRaceDTO pilotRaceDTO, Pilot pilot, Race race) {
+		this(pilotRaceDTO.getId(), pilotRaceDTO.getPlacement(), pilot, race);	
 	}
 	
-	public PilotDTO toDTO() {
-		return new PilotDTO(id, name, country.getId(), country.getName(), team.getId(), team.getName());
+	public PilotRaceDTO toDTO() {
+		return new PilotRaceDTO(id, placement, pilot.getId(), pilot.getName(), race.getId(), DateUtils.zoneDateToBrDate(race.getDate()));
 	}
+	
 }

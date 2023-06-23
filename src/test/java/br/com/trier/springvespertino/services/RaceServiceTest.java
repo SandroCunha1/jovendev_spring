@@ -10,6 +10,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import br.com.trier.springvespertino.BaseTests;
 import br.com.trier.springvespertino.models.Race;
+import br.com.trier.springvespertino.services.exceptions.IntegrityViolation;
 import br.com.trier.springvespertino.services.exceptions.ObjectNotFound;
 import br.com.trier.springvespertino.utils.DateUtils;
 import jakarta.transaction.Transactional;
@@ -83,6 +84,14 @@ class RaceServiceTest extends BaseTests {
 		assertEquals(3, service.listAll().size());
 		assertEquals(1, race.getId());
 		assertEquals(1990, race.getDate().getYear());
+	}
+	
+	@Test
+	@DisplayName("Update corrida data não condiz com ano do campeonato")
+	void updateInvalidDate() {
+		Race race = new Race(1, DateUtils.dateBrToZoneDate("01/10/2000"), runwayService.findById(2), championshipService.findById(1) );
+		var ex = assertThrows(IntegrityViolation.class, () -> service.update(race));
+		assertEquals("Ano da corrida: 2000 Deve ser o mesmo ano do campeonato: 1990 ", ex.getMessage());
 	}
 
 	@Test

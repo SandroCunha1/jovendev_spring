@@ -7,13 +7,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-public class PilotDTO {
+public class PilotRaceDTO {
 
 	private Integer id;
-	private String name;
-	private Integer countryId;
-	private String countryName;
-	private Integer teamId;
-	private String teamName;
-	
+	private Integer placement;
+	private Integer pilotId;
+	private String pilotName;
+	private Integer raceId;
+	private String raceDate;
 }

@@ -1,7 +1,6 @@
 package br.com.trier.springvespertino.resources;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -12,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import br.com.trier.springvespertino.models.Pilot;
+import br.com.trier.springvespertino.models.dto.PilotDTO;
 import br.com.trier.springvespertino.services.CountryService;
 import br.com.trier.springvespertino.services.PilotService;
 import br.com.trier.springvespertino.services.TeamService;
@@ -32,28 +32,29 @@ public class PilotResource {
 	
 	
 	@GetMapping("/{id}")
-	public ResponseEntity<Pilot> findById(@PathVariable Integer id){
-		return ResponseEntity.ok(service.findById(id));
+	public ResponseEntity<PilotDTO> findById(@PathVariable Integer id){
+		return ResponseEntity.ok(service.findById(id).toDTO());
 	}
 	
 	@PostMapping
-	public ResponseEntity<Pilot> insert(@RequestBody Pilot pilot){
-		countryService.findById(pilot.getCountry().getId());
-		teamService.findById(pilot.getTeam().getId());
-		return ResponseEntity.ok(service.insert(pilot));
+	public ResponseEntity<PilotDTO> insert(@RequestBody PilotDTO pilotDTO){
+		Pilot pilot = new Pilot(pilotDTO, countryService.findById(pilotDTO.getCountryId()), teamService.findById(pilotDTO.getTeamId())); 
+		return ResponseEntity.ok(service.insert(pilot).toDTO());
 	}
 	
 	@GetMapping
-	public ResponseEntity<List<Pilot>> listAll(){
-		return ResponseEntity.ok(service.listAll());
+	public ResponseEntity<List<PilotDTO>> listAll(){
+		return ResponseEntity.ok(service.listAll()
+				.stream()
+				.map(pilot -> pilot.toDTO())
+				.toList());
 	}
 	
 	@PostMapping("/{id}")
-	public ResponseEntity<Pilot> update (@RequestBody Pilot pilot, @PathVariable Integer id){
-		countryService.findById(pilot.getCountry().getId());
-		teamService.findById(pilot.getTeam().getId());
+	public ResponseEntity<PilotDTO> update (@RequestBody PilotDTO pilotDTO, @PathVariable Integer id){
+		Pilot pilot = new Pilot(pilotDTO, countryService.findById(pilotDTO.getCountryId()), teamService.findById(pilotDTO.getTeamId())); 
 		pilot.setId(id);
-		return ResponseEntity.ok(service.update(pilot));
+		return ResponseEntity.ok(service.update(pilot).toDTO());
 		
 	}
 	
@@ -64,18 +65,27 @@ public class PilotResource {
 	}
 	
 	@GetMapping("/name/{name}")
-	public ResponseEntity<List<Pilot>> findByNameStartsWithIgnoreCase(@PathVariable String name){
-		return ResponseEntity.ok(service.findByNameStartsWithIgnoreCase(name));
+	public ResponseEntity<List<PilotDTO>> findByNameStartsWithIgnoreCase(@PathVariable String name){
+		return ResponseEntity.ok(service.findByNameStartsWithIgnoreCase(name)
+				.stream()
+				.map(pilot -> pilot.toDTO())
+				.toList());
 	}
 	
 	@GetMapping("/country/{id}")
-	public ResponseEntity<List<Pilot>> findByCountryOrderByName(@PathVariable Integer id){
-		return ResponseEntity.ok(service.findByCountryOrderByName(countryService.findById(id)));
+	public ResponseEntity<List<PilotDTO>> findByCountryOrderByName(@PathVariable Integer id){
+		return ResponseEntity.ok(service.findByCountryOrderByName(countryService.findById(id))
+				.stream()
+				.map(pilot -> pilot.toDTO())
+				.toList());
 	}
 	
 	@GetMapping("/team/{id}")
-	public ResponseEntity<List<Pilot>> findByTeamOrderByName(@PathVariable Integer id){
-		return ResponseEntity.ok(service.findByTeamOrderByName(teamService.findById(id)));
+	public ResponseEntity<List<PilotDTO>> findByTeamOrderByName(@PathVariable Integer id){
+		return ResponseEntity.ok(service.findByTeamOrderByName(teamService.findById(id))
+				.stream()
+				.map(pilot -> pilot.toDTO())
+				.toList());
 	}
 	
 	
