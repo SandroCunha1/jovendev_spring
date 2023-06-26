@@ -6,6 +6,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,12 +35,16 @@ public class User {
 	@Column (name = "password_user")
 	private String password;
 	
+	@Column (name = "permission")
+	@NotNull
+	private String roles;
+	
 	
 	public User(UserDTO dto) {
-		this(dto.getId(), dto.getName(), dto.getEmail(), dto.getPassword());
+		this(dto.getId(), dto.getName(), dto.getEmail(), dto.getPassword(), dto.getRoles());
 	}
 	
 	public UserDTO toDTO() {
-		return new UserDTO(id, name, email, password);
+		return new UserDTO(id, name, email, password, roles);
 	}
 }

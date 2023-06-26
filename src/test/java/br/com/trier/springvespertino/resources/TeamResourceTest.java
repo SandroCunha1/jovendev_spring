@@ -23,6 +23,7 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 
 import br.com.trier.springvespertino.SpringVespertinoApplication;
+import br.com.trier.springvespertino.config.jwt.LoginDTO;
 import br.com.trier.springvespertino.models.Team;
 import br.com.trier.springvespertino.resources.exceptions.StandardError;
 
@@ -35,22 +36,25 @@ class TeamResourceTest {
 	@Autowired
 	protected TestRestTemplate rest;
 
-	private ResponseEntity<Team> getTeam(String url) {
-		return rest.getForEntity(url, Team.class);
-	}
+	UtilToken token = new UtilToken();
+	private ResponseEntity<Team> getTeam(String url, HttpHeaders headers) {
+        return rest.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Team.class);
+    }
 
-	private ResponseEntity<List<Team>> getTeams(String url) {
-		return rest.exchange(url, HttpMethod.GET, null, new ParameterizedTypeReference<>() {
-		});
-	}
+	private ResponseEntity<List<Team>> getTeams(String url, HttpHeaders headers) {
+        return rest.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), new ParameterizedTypeReference<>() {
+        });
+    }
 
 	@Test
 	@DisplayName("Buscar por id")
 	public void testGetOk() {
-		ResponseEntity<Team> response = getTeam("/teams/1");
-		assertEquals(response.getStatusCode(), HttpStatus.OK);
-		Team team = response.getBody();
-		assertEquals("Ferrari", team.getName());
+		
+		HttpHeaders headers =  token.getHeader("sandro1@gmail.com", "123");
+        ResponseEntity<Team> response = getTeam("/teams/1", headers);
+        assertEquals(response.getStatusCode(), HttpStatus.OK);
+        Team team = response.getBody();
+        assertEquals("Ferrari", team.getName());
 	}
 
 	@Test
@@ -156,5 +160,22 @@ class TeamResourceTest {
 		assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
 		List<Team> teams = responseEntity.getBody();
 		assertEquals(1, teams.size());
+	}
+	
+	private HttpHeaders  getHeader(String email, String senha) {
+		LoginDTO loginDTO = new LoginDTO(email, senha);
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_JSON);
+	    HttpEntity<LoginDTO> requestEntity = new HttpEntity<>(loginDTO, headers);
+	    ResponseEntity<String> responseEntity = rest.exchange(
+	            "/auth/token",
+	            HttpMethod.POST,
+	            requestEntity,
+	            String.class
+	    );
+	    assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+	    HttpHeaders headersR = new HttpHeaders();
+	    headersR.setBearerAuth(responseEntity.getBody());
+	    return headersR;
 	}
 }

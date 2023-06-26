@@ -56,7 +56,7 @@ class UserServiceTest extends BaseTests {
 	@Test
 	@DisplayName("Insert novo usuario")
 	void insert() {	
-		User usuario = new User(null, "Sandro", "sandrocunha@gmail.com", "1234");
+		User usuario = new User(null, "Sandro", "sandrocunha@gmail.com", "1234", "ADMIN");
 		userService.insert(usuario);
 		assertEquals(1, userService.listAll().size());
 		assertEquals(1, usuario.getId());
@@ -69,10 +69,10 @@ class UserServiceTest extends BaseTests {
 	@DisplayName("Insert novo usuario com email duplicado")
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
 	void insertWithSameEmail() {	
-		User usuario2 = new User(null, "João", "sandro1@gmail.com", "1234");
+		User usuario2 = new User(null, "João", "sandro1@gmail.com", "1234", "roles");
 		var ex = assertThrows(IntegrityViolation.class, () ->
 		userService.insert(usuario2));
-		assertEquals("Email já existente : sandro1@gmail.com", ex.getMessage());
+		assertEquals("Email já existente: sandro1@gmail.com", ex.getMessage());
 
 	}
 	
@@ -86,7 +86,7 @@ class UserServiceTest extends BaseTests {
 		assertEquals("Sandro1", usuario.getName());
 		assertEquals("sandro1@gmail.com", usuario.getEmail());
 		assertEquals("123", usuario.getPassword());	
-		usuario = new User(1, "Sandro", "sandrocunha@gmail.com", "1234");
+		usuario = new User(1, "Sandro", "sandrocunha@gmail.com", "1234", "ADMIN");
 		userService.update(usuario);
 		assertEquals(3, userService.listAll().size());
 		assertEquals(1, usuario.getId());
@@ -98,7 +98,7 @@ class UserServiceTest extends BaseTests {
 	@Test
 	@DisplayName("Update usuario não existente")
 	void updateInvalid() {
-		User usuario = new User(1, "Sandro", "sandrocunha@gmail.com", "1234");
+		User usuario = new User(1, "Sandro", "sandrocunha@gmail.com", "1234", "roles");
 		var ex = assertThrows(ObjectNotFound.class, () ->
 		userService.update(usuario));
 		assertEquals("O usuário 1 não existe", ex.getMessage());
@@ -109,10 +109,10 @@ class UserServiceTest extends BaseTests {
 	@DisplayName("Update usuario com email cadastrado")
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
 	void updateInvalidSameEmail() {
-		User usuario = new User(1, "Sandro", "sandro2@gmail.com", "1234");
+		User usuario = new User(1, "Sandro", "sandro2@gmail.com", "1234", "roles");
 		var ex = assertThrows(IntegrityViolation.class, () ->
 		userService.update(usuario));
-		assertEquals("Email já existente : sandro2@gmail.com", ex.getMessage());
+		assertEquals("Email já existente: sandro2@gmail.com", ex.getMessage());
 		
 	}
 	

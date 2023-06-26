@@ -2,6 +2,7 @@ package br.com.trier.springvespertino.resources;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,18 +30,20 @@ public class RaceResource {
 	@Autowired
 	private RunwayService runwayService;
 	
-	
+	@Secured({"ROLE_USER"})
 	@GetMapping("/{id}")
 	public ResponseEntity<RaceDTO> findById(@PathVariable Integer id){
 		return ResponseEntity.ok(service.findById(id).toDTO());
 	}
 	
+	@Secured({"ROLE_ADMIN"})
 	@PostMapping
 	public ResponseEntity<RaceDTO> insert(@RequestBody RaceDTO raceDTO){
 		Race race = new Race(raceDTO, runwayService.findById(raceDTO.getChampionshipId()), championshipService.findById(raceDTO.getChampionshipId())); 
 		return ResponseEntity.ok(service.insert(race).toDTO());
 	}
 	
+	@Secured({"ROLE_USER"})
 	@GetMapping
 	public ResponseEntity<List<RaceDTO>> listAll(){
 		return ResponseEntity.ok(service.listAll()
@@ -49,6 +52,7 @@ public class RaceResource {
 				.toList());
 	}
 	
+	@Secured({"ROLE_ADMIN"})
 	@PostMapping("/{id}")
 	public ResponseEntity<RaceDTO> update (@RequestBody RaceDTO raceDTO, @PathVariable Integer id){
 		Race race = new Race(raceDTO, runwayService.findById(raceDTO.getChampionshipId()), championshipService.findById(raceDTO.getChampionshipId())); 
@@ -57,12 +61,14 @@ public class RaceResource {
 		
 	}
 	
+	@Secured({"ROLE_ADMIN"})
 	@DeleteMapping("/{id}")
 	public ResponseEntity<Void> delete(@PathVariable Integer id) {
 		service.delete(id);
 		return ResponseEntity.ok().build();
 	}
 	
+	@Secured({"ROLE_USER"})
 	@GetMapping("/date")
 	public ResponseEntity<List<RaceDTO>> findByDate(@RequestParam("date") String date){
 		return ResponseEntity.ok(service.findByDate(date)
@@ -71,6 +77,7 @@ public class RaceResource {
 				.toList());
 	}
 	
+	@Secured({"ROLE_USER"})
 	@GetMapping("/date/between")
 	public ResponseEntity<List<RaceDTO>> findByDateBetween(@RequestParam("date1") String date1, @RequestParam("date2") String date2){
 		return ResponseEntity.ok(service.findByDateBetween(date1, date2)
@@ -79,6 +86,7 @@ public class RaceResource {
 				.toList());
 	}
 	
+	@Secured({"ROLE_USER"})
 	@GetMapping("/runway/{id}")
 	public ResponseEntity<List<RaceDTO>> findByRunwayOrderByName(@PathVariable Integer id){
 		return ResponseEntity.ok(service.findByRunwayOrderByDate(runwayService.findById(id))
@@ -87,8 +95,9 @@ public class RaceResource {
 				.toList());
 	}
 	
+	@Secured({"ROLE_USER"})
 	@GetMapping("/championship/{id}")
-	public ResponseEntity<List<RaceDTO>> finfByChampionshipOrderByName(@PathVariable Integer id){
+	public ResponseEntity<List<RaceDTO>> findByChampionshipOrderByName(@PathVariable Integer id){
 		return ResponseEntity.ok(service.findByChampionshipOrderByDate(championshipService.findById(id))
 				.stream()
 				.map(race -> race.toDTO())
