@@ -62,13 +62,11 @@ public class RunwayResource {
 		return ResponseEntity.ok(service.findByNameStartsWithIgnoreCase(name));
 		
 	}
-	
-	@GetMapping("/size/{sizeIn}/{sizeFin}")
 	public ResponseEntity<List<Runway>> findBySizeBetween(@PathVariable Integer sizeIn, @PathVariable Integer sizeFin){
 		return ResponseEntity.ok(service.findBySizeBetween(sizeIn, sizeFin));
 	}
 	
-	@GetMapping("/country/{idPais}")
+	@GetMapping("/country/idPais")
 	public ResponseEntity<List<Runway>> findByCountryOrderBySizeDesc(@PathVariable Integer idPais){
 		return ResponseEntity.ok(service.findByCountryOrderBySizeDesc(countryService.findById(idPais)));
 	}
