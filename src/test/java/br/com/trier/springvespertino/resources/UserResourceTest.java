@@ -23,6 +23,7 @@ import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import br.com.trier.springvespertino.SpringVespertinoApplication;
 import br.com.trier.springvespertino.config.jwt.LoginDTO;
 import br.com.trier.springvespertino.models.dto.UserDTO;
+
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = Replace.ANY)
 @Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:/resources/sqls/usuario.sql")

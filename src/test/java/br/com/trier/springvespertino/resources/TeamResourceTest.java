@@ -21,7 +21,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
-
 import br.com.trier.springvespertino.SpringVespertinoApplication;
 import br.com.trier.springvespertino.config.jwt.LoginDTO;
 import br.com.trier.springvespertino.models.Team;
@@ -30,13 +29,14 @@ import br.com.trier.springvespertino.resources.exceptions.StandardError;
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = Replace.ANY)
 @Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:/resources/sqls/time.sql")
+@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:/resources/sqls/usuario.sql")
 @SpringBootTest(classes = SpringVespertinoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class TeamResourceTest {
 
 	@Autowired
 	protected TestRestTemplate rest;
+	
 
-	UtilToken token = new UtilToken();
 	private ResponseEntity<Team> getTeam(String url, HttpHeaders headers) {
         return rest.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Team.class);
     }
@@ -49,29 +49,26 @@ class TeamResourceTest {
 	@Test
 	@DisplayName("Buscar por id")
 	public void testGetOk() {
-		
-		HttpHeaders headers =  token.getHeader("sandro1@gmail.com", "123");
-        ResponseEntity<Team> response = getTeam("/teams/1", headers);
-        assertEquals(response.getStatusCode(), HttpStatus.OK);
-        Team team = response.getBody();
+	    ResponseEntity<Team> response = getTeam("/teams/1", getHeader("sandro1@gmail.com", "123"));
+	    assertEquals(response.getStatusCode(), HttpStatus.OK);
+	    Team team = response.getBody();
         assertEquals("Ferrari", team.getName());
 	}
 
 	@Test
 	@DisplayName("Buscar por id inexistente")
 	public void testGetNotFound() {
-		ResponseEntity<Team> response = getTeam("/teams/100");
+		ResponseEntity<Team> response = getTeam("/teams/100", getHeader("sandro1@gmail.com", "123"));
 		assertEquals(response.getStatusCode(), HttpStatus.NOT_FOUND);
 	}
 
 	@Test
 	@DisplayName("Cadastrar time")
 	@Sql({ "classpath:/resources/sqls/limpa_tabelas.sql" })
+	@Sql({ "classpath:/resources/sqls/usuario.sql" })
 	public void testCreateTeam() {
 		Team team = new Team(null, "Time Teste");
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<Team> requestEntity = new HttpEntity<Team>(team, headers);
+		HttpEntity<Team> requestEntity = new HttpEntity<Team>(team, getHeader("sandro1@gmail.com", "123"));
 		ResponseEntity<Team> responseEntity = rest.exchange("/teams", HttpMethod.POST, requestEntity, Team.class);
 		assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
 		Team createdTeam = responseEntity.getBody();
@@ -82,9 +79,7 @@ class TeamResourceTest {
     @DisplayName("Criar time com mesmo nome")
     public void testCreateTeamWithSameName() {
         Team team = new Team(null, "Ferrari");
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Team> requestEntity = new HttpEntity<>(team, headers);
+        HttpEntity<Team> requestEntity = new HttpEntity<>(team, getHeader("sandro1@gmail.com", "123"));
         ResponseEntity<Void> responseEntity = rest.exchange("/teams", HttpMethod.POST, requestEntity, Void.class);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
     }
@@ -93,9 +88,7 @@ class TeamResourceTest {
 	@DisplayName("Atualizar time")
 	public void testUpdateTeam() {
 		Team team = new Team(null, "Time Atualizado");
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<Team> requestEntity = new HttpEntity<Team>(team, headers);
+		HttpEntity<Team> requestEntity = new HttpEntity<Team>(team, getHeader("sandro1@gmail.com", "123"));
 		ResponseEntity<Team> responseEntity = rest.exchange("/teams/1", HttpMethod.PUT, requestEntity, Team.class);
 		assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
 		Team updatedTeam = responseEntity.getBody();
@@ -106,9 +99,7 @@ class TeamResourceTest {
     @DisplayName("Atualizar time com mesmo nome")
     public void testUpdateTeamWithSameName() {
         Team team = new Team(null, "Ferrari");
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Team> requestEntity = new HttpEntity<>(team, headers);
+        HttpEntity<Team> requestEntity = new HttpEntity<>(team, getHeader("sandro1@gmail.com", "123"));
         ResponseEntity<Void> responseEntity = rest.exchange("/teams/2", HttpMethod.PUT, requestEntity, Void.class);
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
     }
@@ -116,21 +107,23 @@ class TeamResourceTest {
 	@Test
 	@DisplayName("Excluir time")
 	public void testDeleteTeam() {
-		ResponseEntity<Void> responseEntity = rest.exchange("/teams/1", HttpMethod.DELETE, null, Void.class);
-		assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+		HttpHeaders headers = getHeader("sandro1@gmail.com", "123");
+	    ResponseEntity<Void> responseEntity = rest.exchange("/teams/1", HttpMethod.DELETE, new HttpEntity<>(headers), Void.class);
+	    assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
 	}
 	
 	 @Test
 	    @DisplayName("Excluir time inexistente")
 	    public void testDeleteTeamNonExist() {
-	        ResponseEntity<Void> responseEntity = rest.exchange("/teams/100", HttpMethod.DELETE, null, Void.class);
-	        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
+		 ResponseEntity<Void> responseEntity = rest.exchange("/teams/100", HttpMethod.DELETE, new HttpEntity<>(getHeader("sandro1@gmail.com", "123")), Void.class);
+		 assertEquals(responseEntity.getStatusCode(), HttpStatus.NOT_FOUND);
+	       
 	    }
 
 	@Test
 	@DisplayName("Listar todos os times")
 	public void testListAllTeams() {
-		ResponseEntity<List<Team>> responseEntity = getTeams("/teams");
+		ResponseEntity<List<Team>> responseEntity = getTeams("/teams", getHeader("sandro1@gmail.com", "123"));
 		assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
 		List<Team> teams = responseEntity.getBody();
 		assertEquals(3, teams.size());
@@ -139,15 +132,17 @@ class TeamResourceTest {
 	@Test
 	@DisplayName("Listar todos os times sem times cadastrados")
 	@Sql({ "classpath:/resources/sqls/limpa_tabelas.sql" })
+	@Sql({ "classpath:/resources/sqls/usuario.sql" })
 	public void testListAllTeamsInvalid() {
-		ResponseEntity<StandardError> response = rest.getForEntity("/teams", StandardError.class);
-		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());		
+		HttpHeaders headers = getHeader("sandro1@gmail.com", "123");
+	    ResponseEntity<StandardError> response = rest.exchange("/teams", HttpMethod.GET, new HttpEntity<>(headers), StandardError.class);
+	    assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());		
 	}
 	
 	@Test
 	@DisplayName("Listar todos os times ordenados por nome")
 	public void testListAllTeamsOrderByName() {
-		ResponseEntity<List<Team>> responseEntity = getTeams("/teams/name");
+		ResponseEntity<List<Team>> responseEntity = getTeams("/teams/name", getHeader("sandro1@gmail.com", "123"));
 		assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
 		List<Team> teams = responseEntity.getBody();
 		assertEquals(3, teams.size());
@@ -156,7 +151,7 @@ class TeamResourceTest {
 	@Test
 	@DisplayName("Buscar times por nome iniciando com")
 	public void testFindTeamsByNameStartsWithIgnoreCase() {
-		ResponseEntity<List<Team>> responseEntity = getTeams("/teams/name/Ferrari");
+		ResponseEntity<List<Team>> responseEntity = getTeams("/teams/name/Ferrari", getHeader("sandro1@gmail.com", "123"));
 		assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
 		List<Team> teams = responseEntity.getBody();
 		assertEquals(1, teams.size());
