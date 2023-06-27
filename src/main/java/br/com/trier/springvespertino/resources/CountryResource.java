@@ -37,16 +37,6 @@ public class CountryResource {
 		return ResponseEntity.ok(service.listAll());
 	}
 	
-	@GetMapping("/name")
-	public ResponseEntity<List<Country>> findAllByOrderByName() {
-		return ResponseEntity.ok(service.findAllByOrderByName());
-		
-	}
-	
-	@GetMapping("/name/{name}")
-	public ResponseEntity<List<Country>> findByNameStartsWithIgnoreCase(@PathVariable String name) {
-		return ResponseEntity.ok(service.findByNameStartsWithIgnoreCase(name));
-	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<Country> update(@PathVariable Integer id, @RequestBody Country country) {
@@ -58,6 +48,16 @@ public class CountryResource {
 	public ResponseEntity<Void> delete(@PathVariable Integer id) {
 		service.delete(id);
 		return ResponseEntity.ok().build();
+	}
+	@GetMapping("/name")
+	public ResponseEntity<List<Country>> findAllByOrderByName() {
+		return ResponseEntity.ok(service.findAllByOrderByName());
+		
+	}
+	
+	@GetMapping("/name/{name}")
+	public ResponseEntity<List<Country>> findByNameStartsWithIgnoreCase(@PathVariable String name) {
+		return ResponseEntity.ok(service.findByNameStartsWithIgnoreCase(name));
 	}
 	
 }

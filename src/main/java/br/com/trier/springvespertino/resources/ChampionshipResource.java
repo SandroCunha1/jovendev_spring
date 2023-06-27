@@ -36,20 +36,6 @@ public class ChampionshipResource {
 		return ResponseEntity.ok(service.listAll());
 	}
 	
-	@GetMapping("/year/{year}")
-	public ResponseEntity<List<Championship>> findByYear(@PathVariable Integer year) {
-		return ResponseEntity.ok(service.findByYear(year));
-	}
-	
-	@GetMapping("/year/{num1}/{num2}")
-	public ResponseEntity<List<Championship>> findByYearBetween(@PathVariable Integer num1, @PathVariable Integer num2){
-		return ResponseEntity.ok(service.findByYearBetween(num1,num2));
-	}
-
-	@GetMapping("/description/{description}")
-	public ResponseEntity<List<Championship>> findByDescriptionContaining(@PathVariable String description) {
-		return ResponseEntity.ok(service.findByDescriptionContaining(description));
-	}
 	
 	@PutMapping("/{id}")
 	public ResponseEntity<Championship> update(@PathVariable Integer id, @RequestBody Championship championship) {
@@ -61,5 +47,20 @@ public class ChampionshipResource {
 	public ResponseEntity<Void> delete(@PathVariable Integer id) {
 		service.delete(id);
 		return ResponseEntity.ok().build();
+	}
+	
+	@GetMapping("/year/{year}")
+	public ResponseEntity<List<Championship>> findByYear(@PathVariable Integer year) {
+		return ResponseEntity.ok(service.findByYear(year));
+	}
+	
+	@GetMapping("/year/{num1}/{num2}")
+	public ResponseEntity<List<Championship>> findByYearBetween(@PathVariable Integer num1, @PathVariable Integer num2){
+		return ResponseEntity.ok(service.findByYearBetween(num1,num2));
+	}
+	
+	@GetMapping("/description/{description}")
+	public ResponseEntity<List<Championship>> findByDescriptionContaining(@PathVariable String description) {
+		return ResponseEntity.ok(service.findByDescriptionContaining(description));
 	}
 }

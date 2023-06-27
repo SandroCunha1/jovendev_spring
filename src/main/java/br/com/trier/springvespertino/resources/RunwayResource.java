@@ -49,7 +49,7 @@ public class RunwayResource {
 	@Secured({"ROLE_ADMIN"})
 	@PostMapping("/{id}")
 	public ResponseEntity<Runway> update (@RequestBody Runway runway, @PathVariable Integer id){
-		countryService.findById(runway.getCountry().getId());
+		countryService.findById(runway.getId());
 		runway.setId(id);
 		return ResponseEntity.ok(service.update(runway));
 		
