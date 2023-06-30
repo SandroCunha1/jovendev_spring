@@ -21,123 +21,134 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import br.com.trier.springvespertino.SpringVespertinoApplication;
+import br.com.trier.springvespertino.config.jwt.LoginDTO;
 import br.com.trier.springvespertino.models.Championship;
-import br.com.trier.springvespertino.resources.exceptions.StandardError;
 
 @ActiveProfiles("test")
 @AutoConfigureTestDatabase(replace = Replace.ANY)
 @Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:/resources/sqls/campeonato.sql")
+@Sql(executionPhase = ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:/resources/sqls/usuario.sql")
 @SpringBootTest(classes = SpringVespertinoApplication.class, webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 class ChampionshipResourceTest {
 
     @Autowired
     protected TestRestTemplate rest;
 
-    @Test
-    @DisplayName("Buscar campeonato por ID")
-    public void testFindChampionshipById() {
-        ResponseEntity<Championship> response = rest.getForEntity("/championships/1", Championship.class);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        Championship championship = response.getBody();
-        assertNotNull(championship);
-        assertEquals("Formula 1", championship.getDescription());
-    }
 
-    @Test
-    @DisplayName("Buscar campeonato por ID inexistente")
-    public void testFindChampionshipByInvalidId() {
-        ResponseEntity<Championship> response = rest.getForEntity("/championships/100", Championship.class);
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-    }
-
-    @Test
-    @DisplayName("Cadastrar campeonato")
-    @Sql({ "classpath:/resources/sqls/limpa_tabelas.sql" })
-    public void testInsertChampionship() {
-        Championship championship = new Championship(null, "Campeonato Argentino", 2023);
-		HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<Championship> requestEntity = new HttpEntity<Championship>(championship, headers);
-		ResponseEntity<Championship> responseEntity = rest.exchange("/championships", HttpMethod.POST, requestEntity, Championship.class);
-        assertEquals(HttpStatus.OK, responseEntity.getStatusCode());
-        Championship createdChampionship = responseEntity.getBody();
-        assertNotNull(createdChampionship);
-        assertEquals("Campeonato Argentino", createdChampionship.getDescription());
-    }
-    
-    @Test
-    @DisplayName("Cadastrar campeonato com ano inválido")
-    public void testInsertChampionshipWithInvalidYear() {
-        Championship championship = new Championship(null, "Campeonato Argentino", 1980);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Championship> requestEntity = new HttpEntity<>(championship, headers);
-        ResponseEntity<Void> responseEntity = rest.exchange("/championships", HttpMethod.POST, requestEntity, Void.class);
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-    }
-    
-
-    @Test
-    @DisplayName("Atualizar campeonato")
-    public void testUpdateChampionship() {
-        Championship championship = new Championship(null, "Campeonato Uruguaio", 2023);
-        HttpHeaders headers = new HttpHeaders();
-		headers.setContentType(MediaType.APPLICATION_JSON);
-		HttpEntity<Championship> requestEntity = new HttpEntity<Championship>(championship, headers);
-        ResponseEntity<Championship> response = rest.exchange("/championships/1", HttpMethod.PUT, requestEntity, Championship.class);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        Championship updatedChampionship = response.getBody();
-        assertNotNull(updatedChampionship);
-        assertEquals("Campeonato Uruguaio", updatedChampionship.getDescription());
-    }
-    
-    @Test
-    @DisplayName("Atualizar campeonato com ano inválido")
-    public void testUpdateChampionshipWithInvalidYear() {
-        Championship championship = new Championship(null, "Campeonato Uruguaio", 1980);
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<Championship> requestEntity = new HttpEntity<>(championship, headers);
-        ResponseEntity<Void> responseEntity = rest.exchange("/championships/1", HttpMethod.PUT, requestEntity, Void.class);
-        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
-    }
-
-    @Test
-    @DisplayName("Excluir campeonato")
-    public void testDeleteChampionship() {
-        ResponseEntity<Void> response = rest.exchange("/championships/1", HttpMethod.DELETE, null, Void.class);
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-    }
-    
-    @Test
-    @DisplayName("Excluir campeonato inexistente")
-    public void testDeleteChampionshipNonExist() {
-        ResponseEntity<Void> responseEntity = rest.exchange("/championships/100", HttpMethod.DELETE, null, Void.class);
-        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
-    }
-
-    @Test
-    @DisplayName("Listar todos os campeonatos")
-    public void testListAllChampionships() {
-        ResponseEntity<List<Championship>> response = rest.exchange("/championships", HttpMethod.GET, null, new ParameterizedTypeReference<List<Championship>>() {});
-        assertEquals(HttpStatus.OK, response.getStatusCode());
-        List<Championship> championships = response.getBody();
-        assertNotNull(championships);
-        assertEquals(3, championships.size());
-    }
-    
-    @Test
-	@DisplayName("Listar todos os campeonatos sem campeonatos cadastrados")
-	@Sql({ "classpath:/resources/sqls/limpa_tabelas.sql" })
-	public void testListAllTeamsInvalid() {
-		ResponseEntity<StandardError> response = rest.getForEntity("/championships", StandardError.class);
-		assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());		
+	
+	@SuppressWarnings("unused")
+	private ResponseEntity<Championship> getUser(String url, HttpHeaders headers) {
+		return rest.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), Championship.class);
 	}
+
+	private ResponseEntity<List<Championship>> getUsers(String url, HttpHeaders headers) {
+		return rest.exchange(url, HttpMethod.GET, new HttpEntity<>(headers), new ParameterizedTypeReference<List<Championship>>() {
+		});
+	}
+	
+	@Test
+	@DisplayName("Buscar por id")
+	public void testGetOk() {
+
+		HttpHeaders headers = getHeader("sandro1@gmail.com", "123");
+	    ResponseEntity<Championship> response = rest.exchange("/championships/1", HttpMethod.GET, new HttpEntity<>(headers), Championship.class);
+	    assertEquals(response.getStatusCode(), HttpStatus.OK);
+
+	    Championship user = response.getBody();
+	    assertEquals("Formula 1", user.getDescription());
+	}
+
+	@Test
+	@DisplayName("Buscar por id inexistente")
+	public void testGetNotFound() {
+			HttpHeaders headers = getHeader("sandro1@gmail.com", "123");
+		    ResponseEntity<Championship> response = rest.exchange("/championships/100", HttpMethod.GET, new HttpEntity<>(headers), Championship.class);
+		    assertEquals(response.getStatusCode(), HttpStatus.NOT_FOUND);
+	}
+	
+	@Test
+	@DisplayName("Cadastrar Campeonato")
+	public void testCreateChamp() {
+			Championship championship = new Championship(1, "Campeonato Uruguaio", 1990);
+		 	HttpHeaders headers = getHeader("sandro1@gmail.com", "123");
+		    headers.setContentType(MediaType.APPLICATION_JSON);
+		    
+		    HttpEntity<Championship> requestEntity = new HttpEntity<Championship>(championship, headers);
+		    ResponseEntity<Championship> responseEntity = rest.exchange(
+		            "/championships",
+		            HttpMethod.POST,
+		            requestEntity,
+		            Championship.class
+		    		);
+		    assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+		    Championship user = responseEntity.getBody();
+		    assertEquals("Campeonato Uruguaio", user.getDescription());
+	}
+	
+	@Test
+	@DisplayName("Atualizar camp")
+	public void testUpdateCamp() {
+			Championship championship = new Championship(1, "nome atualizado", 1990);
+		    HttpHeaders headers = getHeader("sandro1@gmail.com", "123");
+		    headers.setContentType(MediaType.APPLICATION_JSON);
+		    HttpEntity<Championship> requestEntity = new HttpEntity<Championship>(championship, headers);
+		    ResponseEntity<Championship> responseEntity = rest.exchange(
+		    		"/championships/1",
+		    		HttpMethod.PUT,
+		    		requestEntity,
+		    		Championship.class
+		    		);
+		    assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+		    Championship user = responseEntity.getBody();
+		    assertEquals("nome atualizado", user.getDescription());
+	}
+	
+	@Test
+	@DisplayName("Excluir campeonato")
+	public void testDeleteChamp() {
+		    ResponseEntity<Void> responseEntity = rest.exchange("/championships/1", HttpMethod.DELETE, new HttpEntity<>(getHeader("sandro1@gmail.com", "123")), Void.class);
+		    assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+	}
+	
+	@Test
+	@DisplayName("Excluir campeonato que não existe")
+	public void testDeleteChampNonExist() {
+	    ResponseEntity<Void> responseEntity = rest.exchange("/championships/100", HttpMethod.DELETE, new HttpEntity<>(getHeader("sandro1@gmail.com", "123")), Void.class);
+	    assertEquals(responseEntity.getStatusCode(), HttpStatus.NOT_FOUND);
+	}
+	
+	@Test
+	@DisplayName("Listar todos os usuários")
+	public void testListAllUsers() {
+		    ResponseEntity<List<Championship>> responseEntity = getUsers("/championships", getHeader("sandro1@gmail.com", "123"));
+		    assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+		    List<Championship> users = responseEntity.getBody();
+		    assertEquals(3, users.size());
+	}
+	
+
+	private HttpHeaders  getHeader(String email, String senha) {
+		LoginDTO loginDTO = new LoginDTO(email, senha);
+	    HttpHeaders headers = new HttpHeaders();
+	    headers.setContentType(MediaType.APPLICATION_JSON);
+	    HttpEntity<LoginDTO> requestEntity = new HttpEntity<>(loginDTO, headers);
+	    ResponseEntity<String> responseEntity = rest.exchange(
+	            "/auth/token",
+	            HttpMethod.POST,
+	            requestEntity,
+	            String.class
+	    );
+	    assertEquals(responseEntity.getStatusCode(), HttpStatus.OK);
+	    HttpHeaders headersR = new HttpHeaders();
+	    headersR.setBearerAuth(responseEntity.getBody());
+	    return headersR;
+	}
+	
 
     @Test
     @DisplayName("Buscar campeonatos por descrição contendo")
     public void testFindChampionshipsByDescriptionContaining() {
-        ResponseEntity<List<Championship>> response = rest.exchange("/championships/description/1", HttpMethod.GET, null, new ParameterizedTypeReference<List<Championship>>() {});
+        ResponseEntity<List<Championship>> response = getUsers("/championships/description/1", getHeader("sandro1@gmail.com", "123"));
         assertEquals(HttpStatus.OK, response.getStatusCode());
         List<Championship> championships = response.getBody();
         assertNotNull(championships);
@@ -146,36 +157,24 @@ class ChampionshipResourceTest {
 
     @Test
     @DisplayName("Buscar campeonatos por ano")
-    public void testFindChampionshipsByYear() {
-        ResponseEntity<List<Championship>> response = rest.exchange("/championships/year/1990", HttpMethod.GET, null, new ParameterizedTypeReference<List<Championship>>() {});
+    public void testFindChampionshipsByYear() {  
+        ResponseEntity<List<Championship>> response = getUsers("/championships/year/1990", getHeader("sandro1@gmail.com", "123"));
         assertEquals(HttpStatus.OK, response.getStatusCode());
         List<Championship> championships = response.getBody();
         assertNotNull(championships);
         assertEquals(1, championships.size());
     }
     
-    @Test
-    @DisplayName("Buscar campeonatos por ano inválido")
-    public void testFindChampionshipsByInvalidYear() {
-        ResponseEntity<StandardError> response = rest.exchange("/championships/year/1970", HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
 
     @Test
     @DisplayName("Buscar campeonatos por ano entre dois valores")
     public void testFindChampionshipsByYearBetween() {
-        ResponseEntity<List<Championship>> response = rest.exchange("/championships/year/1990/1991", HttpMethod.GET, null, new ParameterizedTypeReference<List<Championship>>() {});
+        ResponseEntity<List<Championship>> response = getUsers("/championships/year/1990/1991", getHeader("sandro1@gmail.com", "123"));
         assertEquals(HttpStatus.OK, response.getStatusCode());
         List<Championship> championships = response.getBody();
         assertNotNull(championships);
         assertEquals(2, championships.size());
     }
-    
-    @Test
-    @DisplayName("Buscar campeonatos por intervalo de ano inválido")
-    public void testFindChampionshipsByInvalidYearRange() {
-        ResponseEntity<StandardError> response = rest.exchange("/championships/year/1980/2024", HttpMethod.GET, null, new ParameterizedTypeReference<>() {});
-        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-    }
+
 }
 

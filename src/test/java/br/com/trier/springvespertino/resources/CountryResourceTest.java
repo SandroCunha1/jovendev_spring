@@ -149,6 +149,21 @@ class CountryResourceTest {
     }
     
     @Test
+    @DisplayName("Listar todos os países ordenado por nome")
+    public void testListAllCountriesOrder() {
+    	ResponseEntity<List<Country>> response = rest.exchange(
+    	        "/countrys/name",
+    	        HttpMethod.GET,
+    	        new HttpEntity<>(getHeader("sandro1@gmail.com", "123")),
+    	        new ParameterizedTypeReference<List<Country>>() {}
+    	    );
+    	    assertEquals(HttpStatus.OK, response.getStatusCode());
+    	    List<Country> countries = response.getBody();
+    	    assertNotNull(countries);
+    	    assertEquals(4, countries.size());
+    }
+    
+    @Test
 	@DisplayName("Listar todos os países sem países cadastrados")
 	@Sql({ "classpath:/resources/sqls/limpa_tabelas.sql" })
     @Sql({ "classpath:/resources/sqls/usuario.sql" })

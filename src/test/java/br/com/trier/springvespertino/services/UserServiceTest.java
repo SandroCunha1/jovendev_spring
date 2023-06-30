@@ -21,9 +21,9 @@ class UserServiceTest extends BaseTests {
 	@DisplayName("Buscar por ID válido")
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
 	void searchIdValid() {
-		User usuario = userService.findById(1);
+		User usuario = userService.findById(2);
 		assertNotNull(usuario);
-		assertEquals(1, usuario.getId());
+		assertEquals(2, usuario.getId());
 		assertEquals("Sandro1", usuario.getName());
 		assertEquals("sandro1@gmail.com", usuario.getEmail());
 		assertEquals("123", usuario.getPassword());	
@@ -34,8 +34,8 @@ class UserServiceTest extends BaseTests {
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
 	void searchIdInvalid() {	
 		var ex = assertThrows(ObjectNotFound.class, () ->
-		userService.delete(4));
-		assertEquals("O usuário 4 não existe", ex.getMessage());
+		userService.delete(10));
+		assertEquals("O usuário 10 não existe", ex.getMessage());
 	}
 	
 	@Test
@@ -80,16 +80,16 @@ class UserServiceTest extends BaseTests {
 	@DisplayName("Update usuario")
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
 	void update() {	
-		User usuario = userService.findById(1);
+		User usuario = userService.findById(2);
 		assertNotNull(usuario);
-		assertEquals(1, usuario.getId());
+		assertEquals(2, usuario.getId());
 		assertEquals("Sandro1", usuario.getName());
 		assertEquals("sandro1@gmail.com", usuario.getEmail());
 		assertEquals("123", usuario.getPassword());	
-		usuario = new User(1, "Sandro", "sandrocunha@gmail.com", "1234", "ADMIN");
+		usuario = new User(2, "Sandro", "sandrocunha@gmail.com", "1234", "ADMIN");
 		userService.update(usuario);
 		assertEquals(3, userService.listAll().size());
-		assertEquals(1, usuario.getId());
+		assertEquals(2, usuario.getId());
 		assertEquals("Sandro", usuario.getName());
 		assertEquals("sandrocunha@gmail.com", usuario.getEmail());
 		assertEquals("1234", usuario.getPassword());	
@@ -109,7 +109,7 @@ class UserServiceTest extends BaseTests {
 	@DisplayName("Update usuario com email cadastrado")
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
 	void updateInvalidSameEmail() {
-		User usuario = new User(1, "Sandro", "sandro2@gmail.com", "1234", "roles");
+		User usuario = new User(2, "Sandro", "sandro2@gmail.com", "1234", "roles");
 		var ex = assertThrows(IntegrityViolation.class, () ->
 		userService.update(usuario));
 		assertEquals("Email já existente: sandro2@gmail.com", ex.getMessage());
@@ -121,9 +121,9 @@ class UserServiceTest extends BaseTests {
 	@Sql({"classpath:/resources/sqls/usuario.sql"})
 	void deleteUser() {	
 		assertEquals(3, userService.listAll().size());
-		userService.delete(1);
+		userService.delete(2);
 		assertEquals(2, userService.listAll().size());
-		assertEquals(2, userService.listAll().get(0).getId());
+		assertEquals(3, userService.listAll().get(0).getId());
 	}
 	
 	@Test
@@ -135,7 +135,7 @@ class UserServiceTest extends BaseTests {
 		userService.delete(10));
 		assertEquals("O usuário 10 não existe", ex.getMessage());
 		assertEquals(3, userService.listAll().size());
-		assertEquals(1, userService.listAll().get(0).getId());
+		assertEquals(2, userService.listAll().get(0).getId());
 	}
 	
 	@Test
